@@ -151,7 +151,7 @@ function LatinName ($value,$props){
 
 */
 function Text ($value,$props){
-    $pattern = "/^[\w-№\s\.:]{{$props['min']},{$props['max']}}$/";
+    $pattern = "/^[\w-№\s\.\!\?,:]{{$props['min']},{$props['max']}}$/";
     if (Preg ($pattern,$value))
         switch ($props['output']){
             case 'string':
