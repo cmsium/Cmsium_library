@@ -14,9 +14,14 @@ function connectDB($config_path = SETTINGS_PATH) {
         $conn = new PDO("mysql:host=".getConfig('servername', $config_path).";dbname=".getConfig('dbname', $config_path), getConfig('username', $config_path), getConfig('password', $config_path));
         // set the PDO error mode to exception
         $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        echo "Connected successfully\n";
+        if (DEBUG_MODE) {
+            echo "Connected successfully\n";
+        }
     } catch(PDOException $e) {
-        echo "Connection failed: ".$e->getMessage();
+        return false;
+        if (DEBUG_MODE) {
+            echo "Connection failed: ".$e->getMessage();
+        }
     }
 }
 
@@ -26,7 +31,9 @@ function connectDB($config_path = SETTINGS_PATH) {
 function closeConnection() {
     global $conn;
     $conn = null;
-    echo "Connection closed\n";
+    if (DEBUG_MODE) {
+        echo "Connection closed\n";
+    }
 }
 
 /**
@@ -51,7 +58,9 @@ function createDB() {
         $dbname = getConfig('dbname');
         $dbh = new PDO("mysql:host=".getConfig('servername'), getConfig('username'), getConfig('password'));
         $dbh->exec("CREATE SCHEMA IF NOT EXISTS `$dbname` DEFAULT CHARACTER SET utf8;");
-        echo "Database $dbname was created successfully\n";
+        if (DEBUG_MODE) {
+            echo "Database $dbname was created successfully\n";
+        }
         $dbh = null;
     } catch (PDOException $e) {
         die("DB ERROR: ". $e->getMessage());
@@ -66,7 +75,9 @@ function dropDB() {
         $dbname = getConfig('dbname');
         $dbh = new PDO("mysql:host=".getConfig('servername'), getConfig('username'), getConfig('password'));
         $dbh->exec("DROP SCHEMA IF EXISTS `$dbname`;");
-        echo "Database $dbname was destroyed successfully\n";
+        if (DEBUG_MODE) {
+            echo "Database $dbname was destroyed successfully\n";
+        }
         $dbh = null;
     } catch (PDOException $e) {
         die("DB ERROR: ". $e->getMessage());
@@ -87,7 +98,9 @@ function performQuery($query, $config_path = SETTINGS_PATH) {
         $conn->query($query);
         return true;
     } catch(PDOException $e) {
-        echo "Failed: ".$e->getMessage()."\n";
+        if (DEBUG_MODE) {
+            echo "Failed: ".$e->getMessage()."\n";
+        }
         return false;
     }
     closeConnection();
@@ -109,7 +122,9 @@ function performQueryFetch($query, $config_path = SETTINGS_PATH) {
         $result = $sth->fetch(PDO::FETCH_ASSOC);
         return $result ? $result : false;
     } catch(PDOException $e) {
-        echo "Failed: ".$e->getMessage()."\n";
+        if (DEBUG_MODE) {
+            echo "Failed: ".$e->getMessage()."\n";
+        }
         return false;
     }
     closeConnection();

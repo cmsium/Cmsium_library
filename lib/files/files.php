@@ -43,10 +43,14 @@ function writeFile($path, $contents) {
     preg_match('/^.+\/(.+)$/', $path, $matches);
     if (file_exists($path)) {
         file_put_contents($path, $contents);
-        echo "File ".$matches[1]." was rewritten\n";
+        if (DEBUG_MODE) {
+            echo "File ".$matches[1]." was rewritten\n";
+        }
     } else {
         file_put_contents($path, $contents);
-        echo "File ".$matches[1]." was created\n";
+        if (DEBUG_MODE) {
+            echo "File ".$matches[1]." was created\n";
+        }
     }
 }
 
@@ -79,7 +83,9 @@ function writeMigrationHistory($path, $version) {
     } else {
         file_put_contents($path, $version);
     }
-    echo "File ".$matches[1]." was updated\n";
+    if (DEBUG_MODE) {
+        echo "File ".$matches[1]." was updated\n";
+    }
 }
 
 /**
@@ -91,7 +97,9 @@ function clearMigrationHistory($path) {
     preg_match('/^.+\/(.+)$/', $path, $matches);
     if (file_exists($path)) {
         file_put_contents($path, "");
-        echo "File ".$matches[1]." was cleared\n";
+        if (DEBUG_MODE) {
+            echo "File ".$matches[1]." was cleared\n";
+        }
     } else {
         die('File not found!');
     }
@@ -110,5 +118,7 @@ function deleteLastVersion($path) {
     } else {
         clearMigrationHistory($path);
     }
-    echo "File ".$matches[1]." was updated\n";
+    if (DEBUG_MODE) {
+        echo "File ".$matches[1]." was updated\n";
+    }
 }
