@@ -49,13 +49,14 @@ function NotValidateData ($data,$mask){
 *Валидирует массив данных из $_POST по маске
 *
 *@param array $mask Маска;
+ * @param array $array Массив для валидации;
 *
 *@return array|false Отвалидированный массив;
 */
-function ValidateByMask ($mask){
+function ValidateByMask ($array,$mask){
     $data = array();
     foreach ($mask as $key => $value){
-        $res = Validate($key,array('func' => GetFuncFromMask($key,$mask),
+        $res = Validate($array,$key,array('func' => GetFuncFromMask($key,$mask),
                                    'props' => GetPropsFromMask($key,$mask),
                                    'required' => GetReqsFromMask ($key,$mask)));
         if ($res === false)
@@ -71,21 +72,22 @@ function ValidateByMask ($mask){
 /**
 *Отвалидировать параметр
 *
+ * @param array $array Массив для валидации
 *@param string $paramName Имя валидируемого параметра
 *@param array $paramProps Параметры типа
 *
 *@return mixed|NULL Отвалидированный параметр 
 */
-function Validate($paramName, $paramProps){
-    if (isset($_POST[$paramName])){
-        if (empty($_POST[$paramName]))
+function Validate($array, $paramName, $paramProps){
+    if (isset($array[$paramName])){
+        if (empty($array[$paramName]))
             if ($paramProps['required'])
                 return false;
             else
                 return NULL;
-        $check = Check($paramProps['func'],
-                     $_POST[$paramName],
-                     $paramProps['props']);
+        $check = Check( $paramProps['func'],
+                        $array[$paramName],
+                        $paramProps['props']);
         if (!$check)
             return false;
         return $check;
