@@ -11,7 +11,7 @@
 function connectDB($config_path = SETTINGS_PATH) {
     try {
         global $conn;
-        $conn = new PDO("mysql:host=".getConfig('servername', $config_path).";dbname=".getConfig('dbname', $config_path), getConfig('username', $config_path), getConfig('password', $config_path));
+        $conn = new PDO("mysql:host=".getConfig('servername', $config_path).";port=".getConfig('port', $config_path).";dbname=".getConfig('dbname', $config_path), getConfig('username', $config_path), getConfig('password', $config_path));
         // set the PDO error mode to exception
         $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         if (DEBUG_MODE) {
@@ -56,7 +56,7 @@ function getSchemaTables() {
 function createDB() {
     try {
         $dbname = getConfig('dbname');
-        $dbh = new PDO("mysql:host=".getConfig('servername'), getConfig('username'), getConfig('password'));
+        $dbh = new PDO("mysql:host=".getConfig('servername').";port=".getConfig('port'), getConfig('username'), getConfig('password'));
         $dbh->exec("CREATE SCHEMA IF NOT EXISTS `$dbname` DEFAULT CHARACTER SET utf8;");
         if (DEBUG_MODE) {
             echo "Database $dbname was created successfully\n";
@@ -73,7 +73,7 @@ function createDB() {
 function dropDB() {
     try {
         $dbname = getConfig('dbname');
-        $dbh = new PDO("mysql:host=".getConfig('servername'), getConfig('username'), getConfig('password'));
+        $dbh = new PDO("mysql:host=".getConfig('servername').";port=".getConfig('port'), getConfig('username'), getConfig('password'));
         $dbh->exec("DROP SCHEMA IF EXISTS `$dbname`;");
         if (DEBUG_MODE) {
             echo "Database $dbname was destroyed successfully\n";
