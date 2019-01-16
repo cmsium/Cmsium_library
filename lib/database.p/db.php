@@ -1,4 +1,8 @@
 <?php
+namespace DB;
+
+use Files;
+
 /**
  * Библиотека содержит функции для работы с БД: подключение, исполнение запросов
  */
@@ -6,126 +10,156 @@
 /**
  * Функция подключения к БД с помощью настроек, указанных в файле конфигурации
  *
- * @param string $config_path Путь к файлам настроек, по умолчанию определяется в константах defaults.php
+ * @param bool $useDB
+ * @param string $configPath Путь к файлам настроек, по умолчанию определяется в константах defaults.php
+ * @return bool|\PDO
  */
-function connectDB($config_path = SETTINGS_PATH) {
+function connectDB($useDB = true, $configPath = SETTINGS_PATH) {
     try {
-        global $conn;
-        $conn = new PDO("mysql:host=".getConfig('servername', $config_path).";port=".getConfig('port', $config_path).";dbname=".getConfig('dbname', $config_path), getConfig('username', $config_path), getConfig('password', $config_path));
+        $configString = 'mysql:host='.Files\getConfig('servername', $configPath).';';
+        $configString .= ';port='.Files\getConfig('port', $configPath);
+        if ($useDB) {
+            $configString .= ';dbname='.Files\getConfig('dbname', $configPath);
+        }
+
+        $conn = new \PDO($configString,
+            Files\getConfig('username', $configPath),
+            Files\getConfig('password', $configPath));
+
         // set the PDO error mode to exception
-        $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        if (DEBUG_MODE) {
-            echo "Connected successfully\n";
-        }
-    } catch(PDOException $e) {
+        $conn->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+        return $conn;
+    } catch(\PDOException $e) {
         return false;
-        if (DEBUG_MODE) {
-            echo "Connection failed: ".$e->getMessage();
-        }
     }
 }
 
 /**
  * Функция уничтожает текущее подключение к БД
+ *
+ * @param $conn
  */
-function closeConnection() {
-    global $conn;
+function closeConnection(&$conn) {
     $conn = null;
-    if (DEBUG_MODE) {
-        echo "Connection closed\n";
-    }
 }
 
 /**
  * Функция подключается к БД и осуществляет изъятие информации о таблицах в БД, указанной в конфигурации
  *
+ * @param $conn
  * @return mixed Массив данных с таблицами в БД
  */
-function getSchemaTables() {
-    connectDB();
-    global $conn;
-    $dbname = getConfig('dbname');
-    $query = $conn->query("SELECT table_name, column_name FROM INFORMATION_SCHEMA.COLUMNS WHERE table_schema = '$dbname' ORDER BY table_name, ordinal_position");
+function getSchemaTables($conn) {
+    $dbname = Files\getConfig('dbname');
+    $query = $conn->query("SELECT table_name, column_name FROM INFORMATION_SCHEMA.COLUMNS 
+                           WHERE table_schema = '$dbname' ORDER BY table_name, ordinal_position");
     return $query->fetchAll();
-    closeConnection();
 }
 
 /**
  * Функция подключается к БД и создаёт указанную в настройках БД
+ *
+ * @param $conn
+ * @return bool
  */
-function createDB() {
+function createDB($conn) {
     try {
-        $dbname = getConfig('dbname');
-        $dbh = new PDO("mysql:host=".getConfig('servername').";port=".getConfig('port'), getConfig('username'), getConfig('password'));
-        $dbh->exec("CREATE SCHEMA IF NOT EXISTS `$dbname` DEFAULT CHARACTER SET utf8;");
-        if (DEBUG_MODE) {
-            echo "Database $dbname was created successfully\n";
-        }
-        $dbh = null;
-    } catch (PDOException $e) {
-        die("DB ERROR: ". $e->getMessage());
+        $dbname = Files\getConfig('dbname');
+        $conn->exec("CREATE SCHEMA IF NOT EXISTS `$dbname` DEFAULT CHARACTER SET utf8;");
+        return true;
+    } catch (\PDOException $e) {
+        return false;
     }
 }
 
 /**
  * Функция подключается к БД и уничтожает указанную в настройках БД
+ *
+ * @param $conn
+ * @return bool
  */
-function dropDB() {
+function dropDB($conn) {
     try {
-        $dbname = getConfig('dbname');
-        $dbh = new PDO("mysql:host=".getConfig('servername').";port=".getConfig('port'), getConfig('username'), getConfig('password'));
-        $dbh->exec("DROP SCHEMA IF EXISTS `$dbname`;");
-        if (DEBUG_MODE) {
-            echo "Database $dbname was destroyed successfully\n";
-        }
-        $dbh = null;
+        $dbname = Files\getConfig('dbname');
+        $conn->exec("DROP SCHEMA IF EXISTS `$dbname`;");
+        return true;
     } catch (PDOException $e) {
-        die("DB ERROR: ". $e->getMessage());
+        return false;
     }
 }
 
 /**
  * Функция исполняет запрос к БД, переданный в параметрах
  *
+ * @param $conn
  * @param string $query Запрос в БД
- * @param string $config_path Путь к настройкам, по умолчанию определяется константой в defaults.php
  * @return bool
  */
-function performQuery($query, $config_path = SETTINGS_PATH) {
-    connectDB($config_path);
-    global $conn;
+function runQuery($conn, $query) {
     try {
         $conn->query($query);
         return true;
-    } catch(PDOException $e) {
-        if (DEBUG_MODE) {
-            echo "Failed: ".$e->getMessage()."\n";
-        }
+    } catch(\PDOException $e) {
         return false;
     }
-    closeConnection();
 }
 
 /**
  * Функция исполняет запрос к БД, переданный в параметрах с возвращением именованного массива значений
  *
+ * @param $conn
  * @param string $query Запрос в БД
- * @param string $config_path Путь к настройкам, по умолчанию определяется константой в defaults.php
  * @return bool|array False если запрос не удался или нечего возвращать, иначе именованный массив
  */
-function performQueryFetch($query, $config_path = SETTINGS_PATH) {
-    connectDB($config_path);
-    global $conn;
+function runQueryFetch($conn, $query) {
     try {
         $sth = $conn->prepare($query);
         $sth->execute();
         $result = $sth->fetch(PDO::FETCH_ASSOC);
         return $result ? $result : false;
-    } catch(PDOException $e) {
-        if (DEBUG_MODE) {
-            echo "Failed: ".$e->getMessage()."\n";
-        }
+    } catch(\PDOException $e) {
         return false;
     }
-    closeConnection();
 }
+
+/**
+ * Функция исполняет запрос к БД, переданный в параметрах с возвращением именованного массива всех значений
+ *
+ * @param string $query Запрос в БД
+ * @return bool|array False если запрос не удался или нечего возвращать, иначе именованный массив
+ */
+function runQueryFetchAll($conn, $query) {
+    try {
+        $sth = $conn->prepare($query);
+        $sth->execute();
+        return $sth->fetchAll();
+    } catch(\PDOException $e) {
+        return false;
+    }
+}
+
+/**
+ * Procedure calling unified interface
+ *
+ * @param $conn
+ * @param $procedure string Procedure name
+ * @param $props array|bool Array of arguments
+ * @param string $fetch_mode string Fetch mode
+ * @return array|bool Result or false
+ */
+function callProcedure($conn, $procedure, $props = false, $fetch_mode = 'none') {
+    $props = $props ? implode(', ',$props) : '';
+    $query = "CALL $procedure($props);";
+    switch ($fetch_mode) {
+        case 'none':
+            return runQuery($conn, $query); break;
+        case 'fetch':
+            return runQueryFetch($conn, $query); break;
+        case 'fetch_all':
+            return runQueryFetchAll($conn, $query); break;
+        default:
+            return false;
+    }
+}
+
+// TODO: Add transaction and helper functions
