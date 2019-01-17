@@ -1,7 +1,7 @@
 <?php
 namespace Files;
 /**
- * Библиотека содержит функции дял работы с файлами операционной системы
+ * Библиотека содержит функции для работы с файлами операционной системы
  */
 
 /**
@@ -16,7 +16,7 @@ function getConfig($config_name, $path = SETTINGS_PATH) {
         $config = parse_ini_file($path);
         return $config[$config_name];
     } else {
-        die('Config file not found!');
+        die('Config file not found!'.PHP_EOL);
     }
 }
 
@@ -30,7 +30,7 @@ function getFileContent($path) {
     if (file_exists($path)) {
         return file_get_contents($path);
     } else {
-        die('File not found!');
+        die('File not found!'.PHP_EOL);
     }
 }
 

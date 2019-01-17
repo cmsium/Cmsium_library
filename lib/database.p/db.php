@@ -16,10 +16,10 @@ use Files;
  */
 function connectDB($useDB = true, $configPath = SETTINGS_PATH) {
     try {
-        $configString = 'mysql:host='.Files\getConfig('servername', $configPath).';';
-        $configString .= ';port='.Files\getConfig('port', $configPath);
+        $configString = 'mysql:host='.Files\getConfig('servername', $configPath);
+        $configString .= ';port='.Files\getConfig('port', $configPath).';';
         if ($useDB) {
-            $configString .= ';dbname='.Files\getConfig('dbname', $configPath);
+            $configString .= 'dbname='.Files\getConfig('dbname', $configPath).';';
         }
 
         $conn = new \PDO($configString,
@@ -83,7 +83,7 @@ function dropDB($conn) {
         $dbname = Files\getConfig('dbname');
         $conn->exec("DROP SCHEMA IF EXISTS `$dbname`;");
         return true;
-    } catch (PDOException $e) {
+    } catch (\PDOException $e) {
         return false;
     }
 }
@@ -162,4 +162,29 @@ function callProcedure($conn, $procedure, $props = false, $fetch_mode = 'none') 
     }
 }
 
-// TODO: Add transaction and helper functions
+/**
+ * Starts a new transaction
+ *
+ * @param $conn
+ */
+function startTransaction($conn) {
+    $conn->beginTransaction();
+}
+
+/**
+ * Rollbacks a transaction
+ *
+ * @param $conn
+ */
+function rollback($conn) {
+    $conn->rollBack();
+}
+
+/**
+ * Commits a transaction
+ *
+ * @param $conn
+ */
+function commit($conn) {
+    $conn->commit();
+}

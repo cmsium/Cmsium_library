@@ -1,5 +1,6 @@
 <?php
-class TypeConstructor extends Constructor {
+//class TypeConstructor extends Constructor {
+class TypeConstructor {
 
     private static $instance;
 

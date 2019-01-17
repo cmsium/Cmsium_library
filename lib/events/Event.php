@@ -1,6 +1,7 @@
 <?php
 
-class Event implements iEvent{
+//class Event implements iEvent{
+class Event {
     public $event_id;
     public $user_id;
     public $created_at;
