@@ -279,27 +279,6 @@ class DBConnection {
     }
 
     /**
-     * Performs a migration query
-     *
-     * @param $query string Query
-     */
-    public static function performMigrationQuery($query) {
-        try {
-            $host = Config::get('servername');
-            $port = Config::get('port');
-            $dbname = Config::get('dbname');
-            $username = Config::get('username');
-            $password = Config::get('password');
-            $dbh = new PDO("mysql:dbname=$dbname;host=$host;port=$port;charset=UTF8", $username, $password);
-            $dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-            $dbh->query($query);
-            $dbh = null;
-        } catch (PDOException $e) {
-            die("DB ERROR: ". $e->getMessage());
-        }
-    }
-
-    /**
      * Procedure calling unified interface
      *
      * @param $procedure string Procedure name

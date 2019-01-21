@@ -20,9 +20,8 @@ function dashesToCamelCase($string, $capitalizeFirstCharacter = false) {
  */
 function readMigrations($path) {
     if (file_exists($path)) {
-        $file = fopen($path, "r");
-        $contents = fgetcsv($file);
-        fclose($file);
+        $file = file_get_contents($path);
+        $contents = explode(PHP_EOL, $file);
         return $contents;
     } else {
         return [];
@@ -36,9 +35,9 @@ function readMigrations($path) {
  * @param string $version Строка, содержащая версию миграции
  */
 function writeMigration($path, $version) {
-    preg_match('/^.+\/(.+)$/', $path, $matches);
-    if (trim(file_get_contents($path))) {
-        file_put_contents($path, ",$version", FILE_APPEND);
+    preg_match('/^.+\/(.+)$/', $path);
+    if (file_exists($path) && trim(file_get_contents($path))) {
+        file_put_contents($path, PHP_EOL.$version, FILE_APPEND);
     } else {
         file_put_contents($path, $version);
     }
@@ -50,7 +49,7 @@ function writeMigration($path, $version) {
  * @param string $path Путь к файлу истории миграций
  */
 function clearMigrations($path) {
-    preg_match('/^.+\/(.+)$/', $path, $matches);
+    preg_match('/^.+\/(.+)$/', $path);
     if (file_exists($path)) {
         file_put_contents($path, "");
     }
@@ -62,9 +61,11 @@ function clearMigrations($path) {
  * @param $path string Путь к файлу с историей миграций
  */
 function deleteLastMigration($path) {
-    preg_match('/^.+\/(.+)$/', $path, $matches);
-    if (count(readMigrations($path)) > 1) {
-        $str = preg_replace('/,[a-zA-Z0-9._-]+$/', '', file_get_contents($path));
+    preg_match('/^.+\/(.+)$/', $path);
+    $migrations = readMigrations($path);
+    if (count($migrations) > 1) {
+        array_pop($migrations);
+        $str = implode(PHP_EOL, $migrations);
         file_put_contents($path, $str);
     } else {
         clearMigrations($path);

@@ -12,5 +12,10 @@ foreach (glob(MAINDIR.'/lib/*.php') as $filename) {
 
 $rawCommand = $argv[1];
 $command = '\\Migrator\\Actions\\'.dashesToCamelCase($rawCommand);
+$argument = $argv[2] ?? false;
 
-$command();
+if (function_exists($command)) {
+    $command($argument);
+} else {
+    echo 'Command not found!'.PHP_EOL;
+}
