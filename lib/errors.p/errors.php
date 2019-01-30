@@ -1,5 +1,5 @@
 <?php
-namespace Lib\Errors;
+namespace Errors;
 use Lib\Converters as conv;
 use Lib\Headers as header;
 

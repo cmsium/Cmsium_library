@@ -1,5 +1,5 @@
 <?php
-namespace Lib\Headers;
+namespace Headers;
 
     /**
      * Функция определяет заголовок Content-Type, принимая тип контента для ответа.

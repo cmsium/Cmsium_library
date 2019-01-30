@@ -1,0 +1,6 @@
+spl_autoload_register(function ($className) {
+    $classNameArray = explode('\\', $className);
+    $className = array_pop($classNameArray);
+    loadRecursive('%s', $className);
+});
+

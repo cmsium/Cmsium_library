@@ -1,0 +1,11 @@
+
+Usage:  combiner COMMAND [OPTIONS]
+
+PHP Library manager. Get specific libraries from remote git repositories.
+
+Commands:
+    install [specific_lib]     Pull libraries specified in combiner.conf.json file or in options.
+    update                     Update pulled libraries if last commit hash changed in repo.
+    clear                      Remove all post-install files (destination folder and lock-file).
+    help                       Display help manual.
+

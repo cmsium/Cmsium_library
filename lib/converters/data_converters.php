@@ -1,6 +1,6 @@
 <?php
 
-namespace Lib\Converters;
+namespace Converters;
 /**
  * Библиотека содержит функции для работы с конвертацией форматов данных (JSON, XML, CSV)
  */
