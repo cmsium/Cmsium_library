@@ -5,7 +5,7 @@ use Lib\Headers as header;
 
 function getConfig($config_name) {
     static $config_arr=[];
-    $path = \dirname(__FILE__).'/config.ini';
+    $path = \dirname(__FILE__).'/db.custom.ini';
     if (\file_exists($path)) {
         if ($config_arr == null) {
             $config = \parse_ini_file($path);

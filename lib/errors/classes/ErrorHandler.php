@@ -10,7 +10,7 @@ class ErrorHandler {
     public static $config_array;
 
     public static function getConfig($config_name) {
-        $path = dirname(__FILE__).'/config.ini';
+        $path = dirname(__FILE__).'/db.custom.ini';
         if (file_exists($path)) {
             if (self::$config_array == null) {
                 $config = parse_ini_file($path);

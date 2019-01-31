@@ -1,19 +1,9 @@
 <?php
-class DBConnection {
+namespace DB;
+
+class MysqlConnection {
     public $conn;
     public static $instance;
-
-    /**
-     * Get  Instance of DBConnector
-     *
-     * @return object DBConnector new instance or self
-     */
-    public static function getInstance(){
-        if (!(self::$instance instanceof self)) {
-            self::$instance = new self();
-        }
-        return self::$instance;
-    }
 
     protected function __construct() {
         $host = Config::get('servername');
@@ -23,7 +13,6 @@ class DBConnection {
         $password = Config::get('password');
         $conn = new mysqli($host, $username, $password, $dbname, $port);
         if ($conn->connect_errno) {
-            var_dump($conn->connect_error);
             AppErrorHandler::throwException(ERROR_DB_CONNECTION);
         }
         $conn->set_charset('utf8');

@@ -11,7 +11,7 @@ define("ROOTDIR", dirname(__DIR__));
 /**
  * Константа для определения пути к настройкам по умолчанию
  */
-define("SETTINGS_PATH", ROOTDIR."/config/config.ini");
+define("SETTINGS_PATH", ROOTDIR."/config/db.custom.ini");
 
 /**
  * Константа включает/выключает режим отладки
