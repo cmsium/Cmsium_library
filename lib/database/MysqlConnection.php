@@ -1,19 +1,31 @@
 <?php
 namespace DB;
 
-class MysqlConnection {
-    public $conn;
-    public static $instance;
+use Config\ConfigManager;
+use DB\Exceptions\DBConnectionCloseException;
+use DB\Exceptions\DBConnectionException;
+use DB\Exceptions\RunQueryException;
+use DB\Exceptions\TransactionException;
+use DB\Exceptions\UnsupportedDataTypeException;
 
-    protected function __construct() {
-        $host = Config::get('servername');
-        $port = (int)Config::get('port');
-        $dbname = Config::get('dbname');
-        $username = Config::get('username');
-        $password = Config::get('password');
-        $conn = new mysqli($host, $username, $password, $dbname, $port);
+class MysqlConnection {
+
+    use RelationalQueries;
+
+    protected $conn;
+
+    public function __construct() {
+        $config = ConfigManager::module('db');
+
+        $host = $config->get('servername');
+        $port = (int)$config->get('port');
+        $dbname = $config->get('dbname');
+        $username = $config->get('username');
+        $password = $config->get('password');
+
+        $conn = new \mysqli($host, $username, $password, $dbname, $port);
         if ($conn->connect_errno) {
-            AppErrorHandler::throwException(ERROR_DB_CONNECTION);
+            throw new DBConnectionException();
         }
         $conn->set_charset('utf8');
         $this->conn = $conn;
@@ -25,7 +37,7 @@ class MysqlConnection {
      * @param string $query Запрос в БД
      * @return bool
      */
-    public function performQuery($query) {
+    protected function performQuery($query) {
         $conn = $this->conn;
         $result = $conn->query($query);
         if ($result) {
@@ -34,14 +46,11 @@ class MysqlConnection {
             }
             return true;
         } else {
-            echo "Не удалось: (" . $conn->errno . ") " . $conn->error;
-            echo "Запрос: " . $query . PHP_EOL;
-            //ErrorHandler::throwException(PERFORM_QUERY_ERROR,"page");
             return false;
         }
     }
 
-    public function performMultiQuery($query) {
+    protected function performMultiQuery($query) {
         $conn = $this->conn;
         $result = $conn->multi_query($query);
         if ($result) {
@@ -50,8 +59,6 @@ class MysqlConnection {
             }
             return true;
         } else {
-            echo "Не удалось: (" . $conn->errno . ") " . $conn->error;
-            //ErrorHandler::throwException(PERFORM_QUERY_ERROR,"page");
             return false;
         }
     }
@@ -62,7 +69,7 @@ class MysqlConnection {
      * @param string $query Запрос в БД
      * @return bool|array False если запрос не удался или нечего возвращать, иначе именованный массив
      */
-    public function performQueryFetch($query) {
+    protected function performQueryFetch($query) {
         $conn = $this->conn;
         $row = $conn->query($query);
         if ($row) {
@@ -71,11 +78,9 @@ class MysqlConnection {
             while ($conn->more_results()) {
                 $conn->next_result();
             }
-            return $result ? $result : false;
+            return $result ? $result : null;
         } else {
-            echo "Не удалось: (" . $conn->errno . ") " . $conn->error . PHP_EOL;
-            echo "Запрос: " . $query . PHP_EOL;
-            AppErrorHandler::throwException(PERFORM_QUERY_ERROR);
+            return false;
         }
     }
 
@@ -85,7 +90,7 @@ class MysqlConnection {
      * @param string $query Запрос в БД
      * @return bool|array False если запрос не удался или нечего возвращать, иначе именованный массив
      */
-    public function performQueryFetchAll($query) {
+    protected function performQueryFetchAll($query) {
         $conn = $this->conn;
         $row = $conn->query($query);
         if ($row) {
@@ -94,11 +99,9 @@ class MysqlConnection {
             while ($conn->more_results()) {
                 $conn->next_result();
             }
-            return $result ? $result : false;
+            return $result ? $result : null;
         } else {
-            echo "Не удалось: (" . $conn->errno . ") " . $conn->error;
-            echo "Запрос: " . $query . PHP_EOL;
-            AppErrorHandler::throwException(PERFORM_QUERY_ERROR);
+            return false;
         }
     }
 
@@ -109,19 +112,18 @@ class MysqlConnection {
      * @param string $query Query statement
      * @param array $params Enumerated array of binding params
      * @return bool Status
+     * @throws UnsupportedDataTypeException
      */
-    public function performPreparedQuery($query, array $params) {
+    protected function performPreparedQuery($query, array $params) {
         $conn = $this->conn;
         $stmt = $conn->prepare($query);
         if (!$stmt) {
-            echo "Не удалось: (" . $conn->errno . ") " . $conn->error;
-            AppErrorHandler::throwException(PERFORM_QUERY_ERROR);
+            return false;
         }
         $types = $this->getDataTypes($params);
         $stmt->bind_param($types, ...$params);
         if (!$stmt->execute()) {
-            echo "Не удалось: (" . $conn->errno . ") " . $conn->error;
-            AppErrorHandler::throwException(PERFORM_QUERY_ERROR);
+            return false;
         }
         $stmt->close();
         return true;
@@ -133,20 +135,19 @@ class MysqlConnection {
      *
      * @param string $query Query statement
      * @param array $params Enumerated array of binding params
-     * @return bool Status
+     * @return bool|array Status
+     * @throws UnsupportedDataTypeException
      */
-    public function performPreparedQueryFetchAll($query, array $params) {
-         $conn = $this->conn;
+    protected function performPreparedQueryFetchAll($query, array $params) {
+        $conn = $this->conn;
         $stmt = $conn->prepare($query);
         if (!$stmt) {
-            echo "Не удалось: (" . $conn->errno . ") " . $conn->error;
-            AppErrorHandler::throwException(PERFORM_QUERY_ERROR);
+            return false;
         }
         $types = $this->getDataTypes($params);
         $stmt->bind_param($types, ...$params);
         if (!$stmt->execute()) {
-            echo "Не удалось: (" . $conn->errno . ") " . $conn->error;
-            AppErrorHandler::throwException(PERFORM_QUERY_ERROR);
+            return false;
         }
         $result = $stmt->get_result();
         $final_result = [];
@@ -162,6 +163,7 @@ class MysqlConnection {
      *
      * @param $params
      * @return string Data type
+     * @throws UnsupportedDataTypeException
      */
     private function getDataTypes($params) {
         $types = '';
@@ -180,7 +182,7 @@ class MysqlConnection {
                     $types .= 's';
                     break;
                 default:
-                    AppErrorHandler::throwException(UNSUPPORTED_DATA_TYPE);
+                    throw new UnsupportedDataTypeException;
             }
         }
         return $types;
@@ -190,11 +192,12 @@ class MysqlConnection {
      * Sets autocommit db setting
      *
      * @param $mode bool Autocommit mode
+     * @throws TransactionException
      */
     public function setAutoCommit($mode) {
         $conn = $this->conn;
         if (!$conn->autocommit($mode)) {
-            AppErrorHandler::throwException(ERROR_DB_TRANSACTION);
+            throw new TransactionException;
         }
     }
 
@@ -202,12 +205,13 @@ class MysqlConnection {
      * Starts a new transaction
      *
      * @param bool $read_only If true, sets transaction to read only mode
+     * @throws TransactionException
      */
     public function startTransaction($read_only = false) {
         $conn = $this->conn;
         $param = $read_only ? MYSQLI_TRANS_START_READ_ONLY : MYSQLI_TRANS_START_READ_WRITE;
         if (!$conn->begin_transaction($param)) {
-            AppErrorHandler::throwException(ERROR_DB_TRANSACTION);
+            throw new TransactionException;
         }
     }
 
@@ -217,7 +221,7 @@ class MysqlConnection {
     public function rollback() {
         $conn = $this->conn;
         if (!$conn->rollback()) {
-            AppErrorHandler::throwException(ERROR_DB_TRANSACTION);
+            throw new TransactionException;
         }
     }
 
@@ -227,43 +231,7 @@ class MysqlConnection {
     public function commit() {
         $conn = $this->conn;
         if (!$conn->commit()) {
-            AppErrorHandler::throwException(ERROR_DB_TRANSACTION);
-        }
-    }
-
-    /**
-     * Creates a new mysql schema from config
-     */
-    public static function createDB() {
-        try {
-            $host = Config::get('servername');
-            $port = Config::get('port');
-            $dbname = Config::get('dbname');
-            $username = Config::get('username');
-            $password = Config::get('password');
-            $dbh = new PDO("mysql:host=$host;port=$port", $username, $password);
-            $dbh->exec("CREATE SCHEMA IF NOT EXISTS `$dbname` DEFAULT CHARACTER SET utf8;");
-            $dbh = null;
-        } catch (PDOException $e) {
-            die("DB ERROR: ". $e->getMessage());
-        }
-    }
-
-    /**
-     * Drops a mysql schema from config
-     */
-    public static function dropDB() {
-        try {
-            $host = Config::get('servername');
-            $port = Config::get('port');
-            $dbname = Config::get('dbname');
-            $username = Config::get('username');
-            $password = Config::get('password');
-            $dbh = new PDO("mysql:host=$host;port=$port", $username, $password);
-            $dbh->exec("DROP SCHEMA IF EXISTS `$dbname`;");
-            $dbh = null;
-        } catch (PDOException $e) {
-            die("DB ERROR: ". $e->getMessage());
+            throw new TransactionException;
         }
     }
 
@@ -274,6 +242,7 @@ class MysqlConnection {
      * @param $props array|bool Array of arguments
      * @param string $fetch_mode string Fetch mode
      * @return array|bool Result or false
+     * @throws RunQueryException
      */
     public function callProcedure($procedure, $props = false, $fetch_mode = 'none') {
         $props = $props ? implode(', ',$props) : '';
@@ -286,48 +255,18 @@ class MysqlConnection {
             case 'fetch_all':
                 return $this->performQueryFetchAll($query); break;
             default:
-                AppErrorHandler::throwException(PERFORM_QUERY_ERROR);
+                throw new RunQueryException($query);
         }
     }
-
-
-    function generateId($table_name,$table_id_structure = null){
-        if ($table_id_structure){
-            $id = $table_id_structure;
-        } else {
-            $query = "call getTableStructureData('$table_name');";
-            $id = $this->performQueryFetch($query);
-        }
-        do {
-            switch($id['DATA_TYPE']){
-                case 'varchar':
-                    $generated_id = $this->randomString($id['CHARACTER_MAXIMUM_LENGTH']);
-                    break;
-            }
-            $query = "SELECT * FROM $table_name WHERE {$id['COLUMN_NAME']} = '$generated_id';";
-            $result = $this->performQueryFetch($query);
-        } while (!empty($result));
-        return $generated_id;
-    }
-
-
-    function randomString($length, $string = 'abcdef0123456789'){
-        $result='';
-        for($i=0;$i<$length;$i++){
-            $result .= $string[mt_rand(0,strlen($string) - 1)];
-        }
-        return $result;
-    }
-
 
     /**
-     * Destroys an object and kills a connection
+     * Destroys the object and kills connection
      */
     public function __destruct() {
         if ($this->conn) {
             $conn = $this->conn;
             if (!$conn->close()) {
-                AppErrorHandler::throwException(DB_CONN_CLOSE_ERROR);
+                throw new DBConnectionCloseException;
             }
         }
     }
