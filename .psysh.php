@@ -7,5 +7,9 @@ if (file_exists($bootstrapPath)) {
 }
 
 return [
-    'defaultIncludes' => $defaultIncludes
+
+    'defaultIncludes' => $defaultIncludes,
+
+    'startupMessage' => '<info>Cmsium libraries are loaded. Have fun!</info>'
+
 ];
