@@ -24,8 +24,11 @@ function install($package = false) {
         die('Libraries already installed. Use update!'.PHP_EOL);
     }
 
-    Git\pullDirectories($config['git_url'], $directories, $config['destination_dir']);
+    $dirsWithDependencies = Git\pullDirectories($config['git_url'], $directories, $config['destination_dir']);
     echo 'Libraries pulled successfully!'.PHP_EOL;
+
+    // Rewrite config to add dependencies...
+    $config['libraries'] = $dirsWithDependencies;
 
     $lastCommitHash = Git\getLastCommitHash($config['git_url']);
     $config['last_hash'] = $lastCommitHash;
