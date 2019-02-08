@@ -5,66 +5,56 @@
  */
 class File {
 
+    public $id;
     public $path;
-    public $content;
+    public $name;
+    public $type;
+    public $size;
 
-    public function __construct($path) {
-        $this->path = $path;
+    public $driver;
+
+    public function __construct($path = null) {
+        if ($path) {
+            $this->path = $path;
+            $this->size = filesize($path);
+        }
+        return $this;
     }
 
-    /**
-     * Функция для чтения контента любого файла
-     *
-     * @return string Возвращает содержимое файла
-     */
-    public function getContent() {
-        if (file_exists($this->path)) {
-            return file_get_contents($this->path);
-        } else {
-            AppErrorHandler::throwException(NO_FILE_FOUND);
+    public function with($data) {
+        foreach ($data as $key => $value){
+            $this->key = $value;
         }
+        return $this;
+    }
+
+    public function generateId() {
+        $this->id = md5($this->name.microtime(true));
+    }
+
+    public function read(...$args) {
+        return $this->driver->read($this,...$args);
     }
 
     public function exists() {
-        return file_exists($this->path);
+        return $this->driver->exists($this);
     }
 
-    /**
-     * Функция для записи любого содержания из строки в файл
-     *
-     * @param string $contents Строка для записи в файл (с перезаписыванием)
-     * @return bool Результат выполнения
-     */
-    public function write($contents) {
-        if (!is_dir(dirname($this->path))) {
-            mkdir(dirname($this->path), 0775, true);
-        }
-        if (!file_put_contents($this->path, $contents)) {
-            AppErrorHandler::throwException(CANNOT_WRITE_FILE, 'page');
-        }
-        return true;
+    public function write($content,...$args) {
+        return $this->driver->write($this,$content,...$args);
     }
+
 
     public function delete() {
-        if (file_exists($this->path)) {
-            return unlink($this->path);
-        } else {
-            AppErrorHandler::throwException(NO_FILE_FOUND);
-        }
+        return $this->driver->delete($this);
     }
 
-    public function compareWithPatch(File $file, $patch_dest) {
-        return xdiff_file_bdiff($file->path, $this->path, $patch_dest);
+    public function send(...$args) {
+        return $this->driver->send($this,...$args);
     }
 
-    public function applyDiffPatch(File $patch, $dest) {
-        if (xdiff_file_bpatch($this->path, $patch->path, $dest)) {
-            return new File($dest);
-        } else {
-            return false;
-        }
+    public function sendChunked(...$args) {
+        return $this->driver->sendChunked($this,...$args);
     }
-
-    public function __destruct() {}
 
 }
