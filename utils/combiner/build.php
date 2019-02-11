@@ -13,3 +13,4 @@ $phar->setStub("#!/usr/bin/env php\n" . $phar->createDefaultStub("combiner.php")
 
 rename($buildRoot.'/build/combiner.phar', $buildRoot.'/build/combiner');
 system("chmod +x $buildRoot/build/combiner");
+echo 'Built Successfully!'.PHP_EOL;

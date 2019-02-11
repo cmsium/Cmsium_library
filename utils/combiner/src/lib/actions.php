@@ -19,9 +19,9 @@ function install($package = false) {
         $directories = $config['libraries'];
     }
 
-    // TODO: Check if new libs appeared, if so - install only them
     if (is_dir(MAINDIR."/{$config['destination_dir']}")) {
-        die('Libraries already installed. Use update!'.PHP_EOL);
+        echo 'Destination folder found! Clearing...'.PHP_EOL;
+        Helpers\removeDirectory(MAINDIR."/{$config['destination_dir']}");
     }
 
     $dirsWithDependencies = Git\pullDirectories($config['git_url'], $directories, $config['destination_dir']);
