@@ -38,11 +38,11 @@ class Router {
     }
 
     public function route(Request $request){
-            foreach ($this->routes[$request->getMethod()] as $route) {
-                if ($route->match($request->getURL())) {
-                    return $route->invoke($request);
-                }
+        foreach ($this->routes[$request->getMethod()] as $route) {
+            if ($route->match($request->getURL())) {
+                return $route->invoke($request);
             }
-            throw new NotFoundException();
+        }
+        throw new NotFoundException();
     }
 }

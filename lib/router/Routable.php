@@ -2,7 +2,6 @@
 
 
 namespace Router;
-use Request;
 
 trait Routable{
     public $request;

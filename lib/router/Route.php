@@ -104,6 +104,7 @@ class Route {
 
     public function invoke(Request $request){
         if ($this->closure) {
+            // TODO: pass request object to closure too?
             return $this->invokeClosure();
         } elseif ($this->method){
             return $this->invokeMethod($request);
