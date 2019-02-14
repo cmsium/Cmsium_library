@@ -25,7 +25,7 @@ class Server {
 
         $this->host    = $config->get('host');
         $this->port    = (int)$config->get('port');
-        $this->https    = (bool)$config->get('enable_https');
+        $this->https   = (bool)$config->get('enable_https');
         $this->sslCert = $config->get('ssl_cert_file');
         $this->sslKey  = $config->get('ssl_key_file');
         $this->http2   = (bool)$config->get('enable_http2');

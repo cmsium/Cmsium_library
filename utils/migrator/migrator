@@ -11,7 +11,7 @@ foreach (glob(__DIR__.'/lib/*.php') as $filename) {
 if ($rootDir = \Migrator\Files\getMigratorConfig('root_dir', __DIR__.'config.ini')) {
     $settingsPath = \Migrator\Files\getMigratorConfig('root_dir', __DIR__.'config.ini');
     define('ROOTDIR', $rootDir);
-    define('SETTINGS_PATH', $settingsPath);
+    define('SETTINGS_PATH', ROOTDIR.'/'.$settingsPath);
 } else {
     define('ROOTDIR', dirname(__DIR__, 2));
     define('SETTINGS_PATH', ROOTDIR.'/config/db.custom.ini');
