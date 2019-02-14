@@ -8,10 +8,11 @@ foreach (glob(__DIR__.'/lib/*.php') as $filename) {
 }
 
 // Set global configuration
-if ($rootDir = \Migrator\Files\getMigratorConfig('root_dir', __DIR__.'config.ini')) {
-    $settingsPath = \Migrator\Files\getMigratorConfig('root_dir', __DIR__.'config.ini');
+if ($rootDir = \Migrator\Files\getMigratorConfig('root_dir', __DIR__.'/config.ini')) {
+    $settingsPath = \Migrator\Files\getMigratorConfig('db_config_path', __DIR__.'/config.ini');
     define('ROOTDIR', $rootDir);
     define('SETTINGS_PATH', ROOTDIR.'/'.$settingsPath);
+    var_dump(SETTINGS_PATH);
 } else {
     define('ROOTDIR', dirname(__DIR__, 2));
     define('SETTINGS_PATH', ROOTDIR.'/config/db.custom.ini');
