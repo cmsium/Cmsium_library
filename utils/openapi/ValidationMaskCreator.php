@@ -19,6 +19,7 @@ class ValidationMaskCreator {
         $mask = new ValidationMask($maskName,$maskData, $maskType, $this);
         $mask->createString();
         $mask->save($this->path);
+        echo "  ".$maskName.PHP_EOL;
         $this->masks[$maskType][$maskName] = $mask;
     }
 

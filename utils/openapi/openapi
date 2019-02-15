@@ -1,0 +1,29 @@
+<?php
+namespace Openapi;
+
+use gradereport_singleview\local\screen\select;
+
+foreach (glob(__DIR__.'/*.php') as $filename) {
+    require_once $filename;
+}
+
+$generator = new OpenApiGenerator();
+$generator->parse();
+switch ($argv[1]) {
+    case 'generate':
+        switch ($argv[2]) {
+            case 'all';
+                $generator->generateRoutes();
+                $generator->generateMasks();
+                break;
+            case 'masks':
+                $generator->generateMasks();
+                break;
+            case 'routes':
+                $generator->generateRoutes();
+                break;
+        }
+        break;
+}
+
+

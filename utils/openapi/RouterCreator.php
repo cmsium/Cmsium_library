@@ -27,6 +27,7 @@ class RouterCreator {
     }
 
     public function save() {
+        echo "routs: ".PHP_EOL;
         $str =
             "<?php".PHP_EOL.
             "\$router = new Router();" . PHP_EOL;
@@ -37,10 +38,11 @@ class RouterCreator {
                     $this->controllers[$rout->class] = new Controller($rout->class, $this);
                 }
                 $this->controllers[$rout->class]->addMethod($rout->method);
+                echo "  ".$rout->name.PHP_EOL;
             }
         }
-        var_dump(realpath($this->routsPath));
         file_put_contents($this->routsPath, $str);
+        echo "controllers: ".PHP_EOL;
         foreach ($this->controllers as $controller){
             $controller->save();
         }

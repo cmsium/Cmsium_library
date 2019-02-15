@@ -35,6 +35,7 @@ class Controller {
             $str .= "public function {$method} () {}".PHP_EOL;
         }
         $str .= "}";
-        return file_put_contents($this->routerCreator->controllersPath."/".ucfirst($this->name).".php", $str);
+        file_put_contents($this->routerCreator->controllersPath."/".ucfirst($this->name).".php", $str);
+        echo "  ".$this->name.PHP_EOL;
     }
 }
