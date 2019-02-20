@@ -1,31 +1,25 @@
 <?php
 include __DIR__.'/lib/init_libs.php';
 
-class Application implements \HttpServer\SwooleHttpApplication {
-
-    public $router;
-
-    public function __construct(\Router\Router $router) {
-        $this->router = $router;
-    }
-
-    public function handle($request, $response) {
-        $request = new \HttpServer\SwooleRequest($request);
-        $result = $this->router->route($request);
-        $response->end($result.PHP_EOL);
-    }
-
-}
-
 $router = new \Router\Router();
+$application = \Webgear\Swoole\Application::getInstance($router);
 
 // Routes
 $router->get('/users', function() {
     return 'Hi!';
 });
-// End Routes
 
-$application = new Application($router);
+$router->get('/test/array', function() {
+    $application = \Webgear\Swoole\Application::getInstance();
+    $application->setHeader('X-Hello', 'World');
+    $testVar = 'hi!';
+    echo 'asdasdasdas';
+    ob_start();
+    include __DIR__.'/template.html.php';
+    $output = ob_get_clean();
+    return $output;
+});
+// End Routes
 
 $server = new \HttpServer\Server($application);
 $server->launch();

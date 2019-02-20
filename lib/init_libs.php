@@ -35,7 +35,6 @@ function requireAutoload($dir, $className, $depth=0) {
         $fileName = basename($path);
         if ($fileName == "$className.php") {
             require_once $path;
-            break;
         }
         elseif (is_dir($path)) {
             requireAutoload($path, $className,$depth+1);
