@@ -9,15 +9,17 @@ $router->get('/users', function() {
     return 'Hi!';
 });
 
-$router->get('/test/array', function() {
+$router->get('/test', function() {
     $application = \Webgear\Swoole\Application::getInstance();
     $application->setHeader('X-Hello', 'World');
-    $testVar = 'hi!';
-    echo 'asdasdasdas';
-    ob_start();
-    include __DIR__.'/template.html.php';
-    $output = ob_get_clean();
-    return $output;
+
+    $testVar = 'Hello!';
+
+    // Using Presenter lib to render stuff
+    $page = \Presenter\PageBuilder::getInstance()->build('template');
+    $pageOutput = $page->with(compact('testVar'))->render();
+
+    return $pageOutput;
 });
 // End Routes
 
