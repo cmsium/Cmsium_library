@@ -1,11 +1,13 @@
 <?php
 namespace Openapi;
 
-use gradereport_singleview\local\screen\select;
-
 foreach (glob(__DIR__.'/*.php') as $filename) {
     require_once $filename;
 }
+foreach (glob(__DIR__.'/router/*.php') as $filename) {
+    require_once $filename;
+}
+
 
 $generator = new OpenApiGenerator();
 $generator->parse();
@@ -22,6 +24,23 @@ switch ($argv[1]) {
             case 'routes':
                 $generator->generateRoutes();
                 break;
+            default:
+                echo "Command not found";
+        }
+        break;
+    case 'save':
+        switch ($argv[2]) {
+            case 'all';
+                $generator->saveRoutes();
+                $generator->saveMasks();
+                $generator->save();
+                break;
+            case 'routes':
+                $generator->saveRoutes();
+                $generator->save();
+                break;
+            default:
+                echo "Comand not found";
         }
         break;
 }

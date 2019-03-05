@@ -2,23 +2,26 @@
 namespace Openapi;
 
 class ValidationMask {
-    public $creator;
-
+    
+    public $namespace;
     public $name;
     public $structure;
     public $type;
     public $str;
 
-    public function __construct($maskName,$maskData, $maskType, $creator) {
+    public function __construct($maskName) {
         $this->name = $maskName;
+    }
+
+    public function with($maskData, $maskType, $namespace) {
         $this->structure = $maskData;
         $this->type = $maskType;
-        $this->creator = $creator;
+        $this->namespace = $namespace;
     }
 
     public function createString() {
         $str = "<?php".PHP_EOL.
-            "namespace {$this->creator->namespace};".PHP_EOL.PHP_EOL.
+            "namespace {$this->namespace};".PHP_EOL.PHP_EOL.
             "class ". $this->generateName()." extends {$this->type} {".PHP_EOL.
             "public \$structure = ".PHP_EOL.$this->varexport($this->structure,true).PHP_EOL.";".PHP_EOL."}";
         $this->str = $str;
@@ -32,6 +35,18 @@ class ValidationMask {
         } else {
             return file_put_contents($savePath, $this->str);
         }
+    }
+
+    public function read() {
+        $class = $this->namespace."\\".$this->generateName();
+        $mask = new $class();
+        $reflection = new \ReflectionClass($class);
+        $fulltype = $reflection->getParentClass()->name;
+        $exp = explode("\\", $fulltype);
+        $type = end($exp);
+
+        $this->structure = $mask->structure;
+        $this->type = $type;
     }
 
     public function generateName() {
