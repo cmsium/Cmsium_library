@@ -10,6 +10,10 @@ class OpenApiGenerator {
     public $routesPath;
     public $controllersPath;
 
+    public $routesNamespace;
+    public $validationNamespace;
+    public $validationMasksNamespace;
+
     public $maskCreator;
     public $routerCreator;
 
@@ -20,9 +24,15 @@ class OpenApiGenerator {
         $this->masksPath = $this->getConfig("masksPath");
         $this->routesPath = $this->getConfig("routesPath");
         $this->controllersPath = $this->getConfig("controllersPath");
+        $this->validationNamespace = $this->getConfig("validationNamespace");
+        $this->validationMasksNamespace = $this->getConfig("masksNamespace");
+        $this->routesNamespace= $this->getConfig("routesNamespace");
 
-        $this->maskCreator = new ValidationMaskCreator($this->masksPath);
-        $this->routerCreator = new RouterCreator($this->routesPath, $this->controllersPath);
+        $this->maskCreator = new ValidationMaskCreator($this->masksPath, $this->validationMasksNamespace);
+        $this->routerCreator = new RouterCreator(
+            $this->routesPath, $this->controllersPath,
+            $this->routesNamespace, $this->validationNamespace
+        );
     }
 
     public function getConfig($config_name) {
@@ -88,7 +98,7 @@ class OpenApiGenerator {
         $props->description = $path->description;
         $props->operationId = $path->method;
         $props->tags = [];
-        $props->tags[] = $path->class;
+        $props->tags[] = substr($path->class,0, -10);
     }
 
     public function saveMasks() {
@@ -113,7 +123,6 @@ class OpenApiGenerator {
                 @$this->openapi->paths->{$path->path}->$method->requestBody->content->$contentType->schema = $mask->structure;
                 break;
         }
-        //$this->openapi->paths->{$path->path}->{$path->HTTPmethod};
     }
 
 
@@ -124,7 +133,11 @@ class OpenApiGenerator {
             }
         }
         $this->routerCreator->addTags($this->openapi->tags);
-        $this->routerCreator->save();
+        $this->routerCreator->saveRoutes();
+    }
+
+    public function generateControllers($withValidation = false) {
+        $this->routerCreator->saveControllers($withValidation);
     }
 
     public function generateMasks() {

@@ -16,6 +16,7 @@ switch ($argv[1]) {
         switch ($argv[2]) {
             case 'all';
                 $generator->generateRoutes();
+                $generator->generateControllers(true);
                 $generator->generateMasks();
                 break;
             case 'masks':
@@ -23,6 +24,7 @@ switch ($argv[1]) {
                 break;
             case 'routes':
                 $generator->generateRoutes();
+                $generator->generateControllers();
                 break;
             default:
                 echo "Command not found";

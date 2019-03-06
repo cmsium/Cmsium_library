@@ -7,7 +7,7 @@ class ValidationMaskCreator {
     public $namespace;
     public $masks=[];
 
-    public function __construct($savePath, $namespace = "Validation\masks") {
+    public function __construct($savePath, $namespace) {
         $this->path = $savePath;
         $this->namespace = $namespace;
     }

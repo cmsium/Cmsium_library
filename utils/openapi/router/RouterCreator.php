@@ -10,6 +10,7 @@ namespace Openapi\Router;
 
 class RouterCreator {
     public $namespace;
+    public $validationNamespace;
     public $routesPath;
     public $controllersPath;
 
@@ -17,10 +18,11 @@ class RouterCreator {
     public $controllers = [];
     public $tags = [];
 
-    public function __construct($routesPath, $controllersPath, $namespace = "Router") {
+    public function __construct($routesPath, $controllersPath, $namespace, $validationNamespace) {
         $this->routesPath = $routesPath;
         $this->controllersPath = $controllersPath;
         $this->namespace = $namespace;
+        $this->validationNamespace = $validationNamespace;
     }
 
     public function addTags($tags) {
@@ -55,35 +57,43 @@ class RouterCreator {
                $summary = $doc->getMethodSummary();
                $description = $doc->getMethodDescription();
                $classDescription = $doc->getClassDescription();
-               $this->createTag($path->class, $classDescription);
+               $this->createTag(substr($path->class,0, -10), $classDescription);
                $this->create($HTTPmethod, $path->path, $path->class, $path->method,$summary, $description);
            }
         }
         return $this->routes;
     }
 
-    public function save() {
+    public function saveRoutes() {
         echo "routes: ".PHP_EOL;
         $str =
             "<?php".PHP_EOL;
         foreach ($this->routes as $HTTPmethod => $routes) {
             foreach ($routes as $rout) {
                 $str .= $rout->getString($HTTPmethod);
-                if (!key_exists($rout->class, $this->controllers)){
-                    $this->controllers[$rout->class] = new Controller(
-                        $rout->class,
-                        $this->namespace,
-                        $this->controllersPath,
-                        $this->tags[$rout->class]->description);
-                }
-                $this->controllers[$rout->class]->addMethod($rout->method, $rout->summary, $rout->description);
                 echo "  ".$rout->path.PHP_EOL;
             }
         }
         file_put_contents($this->routesPath, $str);
+    }
+
+    public function saveControllers($withValidation = false) {
         echo "controllers: ".PHP_EOL;
+        foreach ($this->routes as $HTTPmethod => $routes) {
+            foreach ($routes as $rout) {
+                if (!key_exists($rout->class, $this->controllers)){
+                    $this->controllers[$rout->class] = new Controller(
+                        $rout->class,
+                        $this->namespace,
+                        $this->validationNamespace,
+                        $this->controllersPath,
+                        $this->tags[$rout->class]->description);
+                }
+                $this->controllers[$rout->class]->addMethod($rout->method, $rout->summary, $rout->description, $rout->args);
+            }
+        }
         foreach ($this->controllers as $controller){
-            $controller->save();
+            $controller->save($withValidation);
         }
     }
 }

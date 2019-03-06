@@ -30,6 +30,6 @@ class RouteCreator extends Route{
 
 
     public function getString(){
-        return "\$router->$this->HTTPmethod(\"{$this->path}\", \"".ucfirst($this->class)."\", \"{$this->method}\");".PHP_EOL;
+        return "\$router->$this->HTTPmethod(\"{$this->path}\", \"".ucfirst($this->class)."Controller\", \"{$this->method}\");".PHP_EOL;
     }
 }
