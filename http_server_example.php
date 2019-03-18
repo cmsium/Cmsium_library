@@ -6,7 +6,9 @@ $application = \Webgear\Swoole\Application::getInstance($router);
 
 // Routes
 $router->get('/hello', function() {
-    return \App\Controller\SomeController::hi();
+    //// Testing App
+    // return \App\Controller\SomeController::hi();
+    return 'hi!';
 });
 
 $router->get('/test', function() {
