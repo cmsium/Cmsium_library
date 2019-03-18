@@ -5,8 +5,8 @@ $router = new \Router\Router();
 $application = \Webgear\Swoole\Application::getInstance($router);
 
 // Routes
-$router->get('/users', function() {
-    return 'Hi!';
+$router->get('/hello', function() {
+    return \App\Controller\SomeController::hi();
 });
 
 $router->get('/test', function() {

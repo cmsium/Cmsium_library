@@ -26,11 +26,20 @@ class Application {
 
     public function __construct($router) {
         $this->router = $router;
+
+        // Register psr-4 autoloader for app classes
+        $this->registerAppClassesLoader('app');
     }
 
     public function handle($request, $response) {
         $this->request = $request;
         $this->response = $response;
+    }
+
+    private function registerAppClassesLoader($directory) {
+        $loader = new Autoloader;
+        $loader->addNamespace('App', ROOTDIR."/$directory");
+        $loader->register();
     }
 
 }
