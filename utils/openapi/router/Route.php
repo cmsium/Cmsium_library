@@ -90,7 +90,8 @@ class Route {
     }
 
     public function invokeMethod(Request $request){
-        $class = new $this->class($request);
+        $class_name = "App\\Controllers\\".$this->class;
+        $class = new $class_name($request);
         $method = $this->method;
         if ($this->args) {
             //TODO try catch

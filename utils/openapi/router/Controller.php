@@ -34,12 +34,12 @@ class Controller {
         $str =
             "<?php".PHP_EOL.
             "namespace {$this->namespace};".PHP_EOL.PHP_EOL.
-            "use {$this->validationNamespace}\Validator;".PHP_EOL.PHP_EOL.
+            "use \\{$this->validationNamespace}\\Validator;".PHP_EOL.PHP_EOL.
             "/**".PHP_EOL.
             " * @description {$this->description}".PHP_EOL.
             " */".PHP_EOL.
             "class ".ucfirst($this->name)."Controller {".PHP_EOL.
-            "   use Routable;".PHP_EOL;
+            "   use \Routes\\Routable;".PHP_EOL;
         foreach ($this->methods as $method => $data) {
             if (!empty($data["args"])) {
                 $args = [];

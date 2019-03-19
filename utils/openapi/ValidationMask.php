@@ -22,7 +22,7 @@ class ValidationMask {
     public function createString() {
         $str = "<?php".PHP_EOL.
             "namespace {$this->namespace};".PHP_EOL.PHP_EOL.
-            "class ". $this->generateName()." extends {$this->type} {".PHP_EOL.
+            "class ". $this->generateName()." extends \\Validation\\masks\\{$this->type} {".PHP_EOL.
             "public \$structure = ".PHP_EOL.$this->varexport($this->structure,true).PHP_EOL.";".PHP_EOL."}";
         $this->str = $str;
     }

@@ -58,7 +58,7 @@ class OpenApiGenerator {
     }
 
     public function loadControllers() {
-        require_once __DIR__."/".$this->controllersPath."/Routable.php";
+        require_once __DIR__ ."/router/Routable.php";
         foreach (glob(__DIR__."/".$this->controllersPath."/*.php") as $filename) {
             require_once $filename;
         }
