@@ -1,6 +1,13 @@
 <?php
 include __DIR__.'/lib/init_libs.php';
 
+// Create test pipeline
+$plumber = \Plumber\Plumber::getInstance();
+$pipeline = $plumber->buildPipeline('webgear.pre');
+$pipeline->addPipe(function ($request) {
+    var_dump($request);
+});
+
 $router = new \Router\Router();
 $application = \Webgear\Swoole\Application::getInstance($router);
 
