@@ -73,7 +73,7 @@ class Field {
     }
 
     public function __call($method, $args) {
-        $className = "Validation\\types\\" . $method;
+        $className = "Validation\\types\\" . ucfirst($method);
         $callbackClass = new $className();
         if ($callbackClass instanceof ValidationType) {
             $callbackClass->args = $args;
