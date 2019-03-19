@@ -71,7 +71,7 @@ class Route {
     }
 
     public function prepareMethodArgs(){
-        $arg_count = (new ReflectionMethod($this->class, $this->method))->getNumberOfParameters();
+        $arg_count = (new ReflectionMethod("App\\Controllers\\".$this->class, $this->method))->getNumberOfParameters();
         if (count($this->args) < $arg_count) {
             throw new TooFewArgumentsException();
         }
