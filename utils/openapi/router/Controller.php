@@ -39,7 +39,7 @@ class Controller {
             " * @description {$this->description}".PHP_EOL.
             " */".PHP_EOL.
             "class ".ucfirst($this->name)."Controller {".PHP_EOL.
-            "   use \Routes\\Routable;".PHP_EOL;
+            "   use \Router\\Routable;".PHP_EOL;
         foreach ($this->methods as $method => $data) {
             if (!empty($data["args"])) {
                 $args = [];
