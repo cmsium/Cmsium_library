@@ -1,9 +1,9 @@
 config.ini
 controllers
-Masks
 !Masks/Mask.php
 !Masks/DefaultMask.php
 !Masks/OpenAPI.php
 !Masks/OpenAPIContent.php
 !Masks/OpenAPIParameters.php
+Masks
 routes
