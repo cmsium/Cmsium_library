@@ -74,6 +74,10 @@ class RouterCreator {
                 echo "  ".$rout->path.PHP_EOL;
             }
         }
+        $dir = dirname($this->routesPath);
+        if (!is_dir($dir)){
+            mkdir($dir, 0755, true);
+        }
         file_put_contents($this->routesPath, $str);
     }
 

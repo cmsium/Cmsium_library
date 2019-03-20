@@ -16,6 +16,9 @@ class ValidationMaskCreator {
         if (!$maskType){
             $maskType = " OpenAPIParameters";
         }
+        if (!is_dir($this->path)){
+            mkdir($this->path, 0755, true);
+        }
         $mask = new ValidationMask($maskName);
         $mask->with($maskData, $maskType, $this->namespace);
         $mask->createString();

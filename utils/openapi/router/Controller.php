@@ -82,6 +82,9 @@ class Controller {
                 "   }".PHP_EOL;
         }
         $str .= "}";
+        if (!is_dir($this->controllersPath)){
+            mkdir($this->controllersPath, 0755, true);
+        }
         file_put_contents($this->controllersPath."/".ucfirst($this->name)."Controller.php", $str);
         echo "  ".$this->name.PHP_EOL;
     }
