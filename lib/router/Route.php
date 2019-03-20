@@ -13,6 +13,7 @@ class Route {
     public $class;
     public $method;
 
+    public $default_args;
     public $args;
 
     public $matchString;
@@ -33,7 +34,7 @@ class Route {
 
     public function parsePath(){
         if (preg_match_all("@{([A-Za-z\d]+)}@U",$this->path,$args)){
-            $this->args = array_flip($args[1]);
+            $this->default_args = array_flip($args[1]);
         }
         $this->matchString = preg_replace("@{[A-Za-z\d]+}@U","([A-Za-z\d]+)", $this->path);
         $this->matchString = str_replace("/","\/",$this->matchString);
@@ -56,7 +57,7 @@ class Route {
     }
 
     public function fillArgs($args){
-        foreach ($this->args as $key => $value) {
+        foreach ($this->default_args as $key => $value) {
             $this->args[$key] = $args[$value];
         }
 
