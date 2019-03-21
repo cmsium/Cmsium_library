@@ -39,7 +39,7 @@ class Controller {
             " * @description {$this->description}".PHP_EOL.
             " */".PHP_EOL.
             "class ".ucfirst($this->name)."Controller {".PHP_EOL.
-            "   use \Router\\Routable;".PHP_EOL;
+            "    use \Router\\Routable;".PHP_EOL;
         foreach ($this->methods as $method => $data) {
             if (!empty($data["args"])) {
                 $args = [];
@@ -56,30 +56,30 @@ class Controller {
                     }
                     $fields = implode(",", $fields);
                     $body =
-                        "       \$validator = new Validator([$fields],\"" . ucfirst($method) . "\");" . PHP_EOL .
-                        "       \$result = \$validator->get();" . PHP_EOL .
-                        "       \$errors = \$validator->errors();" . PHP_EOL;
+                        "        \$validator = new Validator([$fields],\"" . ucfirst($method) . "\");" . PHP_EOL .
+                        "        \$result = \$validator->get();" . PHP_EOL .
+                        "        \$errors = \$validator->errors();" . PHP_EOL;
                 }
             } else {
                 $args = "";
                 $body = "";
                 if ($withValidation) {
                     $body =
-                        "       \$validator = new Validator(\$this->request->getArgs(),\"" . ucfirst($method) . "\");" . PHP_EOL .
-                        "       \$result = \$validator->get();" . PHP_EOL .
-                        "       \$errors = \$validator->errors();" . PHP_EOL;
+                        "        \$validator = new Validator(\$this->request->getArgs(),\"" . ucfirst($method) . "\");" . PHP_EOL .
+                        "        \$result = \$validator->get();" . PHP_EOL .
+                        "        \$errors = \$validator->errors();" . PHP_EOL;
                 }
             }
 
             $str .=
                 PHP_EOL.
-                "   /**".PHP_EOL.
-                "    * @summary {$data['summary']}".PHP_EOL.
-                "    * @description {$data['description']}".PHP_EOL.
-                "    */".
+                "    /**".PHP_EOL.
+                "     * @summary {$data['summary']}".PHP_EOL.
+                "     * @description {$data['description']}".PHP_EOL.
+                "     */".
                 PHP_EOL."   public function {$method} ($args) {".PHP_EOL.
                 $body.PHP_EOL.
-                "   }".PHP_EOL;
+                "    }".PHP_EOL;
         }
         $str .= "}";
         if (!is_dir($this->controllersPath)){
