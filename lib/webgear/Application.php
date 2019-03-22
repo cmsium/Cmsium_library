@@ -9,7 +9,7 @@ use Plumber\Plumber;
  *
  * @package Webgear
  */
-class Application {
+abstract class Application {
 
     public $router;
     public $request;
@@ -58,7 +58,7 @@ class Application {
      *
      * To be implemented by children.
      */
-    protected function run(){}
+    abstract protected function run();
 
     /**
      * Finishes the request-response cycle by throwing away a response to web-server
@@ -67,7 +67,7 @@ class Application {
      *
      * @param $result mixed Result of business logic
      */
-    protected function finish($result){}
+    abstract protected function finish($result);
 
     protected function runMiddleware($context) {
         $argument = $context === 'pre' ? $this->request : $this->response;
