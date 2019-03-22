@@ -14,6 +14,7 @@ abstract class Application {
     public $router;
     public $request;
     public $response;
+    public $appDirectory = 'app';
 
     public static $instance;
 
@@ -30,7 +31,7 @@ abstract class Application {
         $this->router = $router;
 
         // Register psr-4 autoloader for app classes
-        $this->registerAppClassesLoader('app');
+        $this->registerAppClassesLoader($this->appDirectory);
     }
 
     /**
@@ -76,7 +77,7 @@ abstract class Application {
         $plumber->runPipeline("webgear.$context", $argument);
     }
 
-    private function registerAppClassesLoader($directory) {
+    protected function registerAppClassesLoader($directory) {
         $loader = new Autoloader;
         $loader->addNamespace('App', ROOTDIR."/$directory");
         $loader->register();
