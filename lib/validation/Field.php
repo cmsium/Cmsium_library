@@ -54,7 +54,7 @@ class Field {
                 return true;
             }
         } else {
-            if (empty($this->value)){
+            if (empty($this->value) and $this->value !== 0 and $this->value !== "0" and $this->value !== 0.0){
                 $this->error = $this->nullableMessage;
                 return false;
             } else {
