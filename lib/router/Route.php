@@ -36,7 +36,7 @@ class Route {
         if (preg_match_all("@{([A-Za-z\d]+)}@U",$this->path,$args)){
             $this->default_args = array_flip($args[1]);
         }
-        $this->matchString = preg_replace("@{[A-Za-z\d]+}@U","([A-Za-z\d]+)", $this->path);
+        $this->matchString = preg_replace("@{[A-Za-z\d]+}@U","([A-Za-z\d\=\;\.\,\(\)]+)", $this->path);
         $this->matchString = str_replace("/","\/",$this->matchString);
         $this->matchString = "@".$this->matchString."@";
         return;

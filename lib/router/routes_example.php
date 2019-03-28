@@ -14,7 +14,7 @@ $request = new Request();
 
 $router = new Router();
 $router->get("/users/{user}", function ($user) use ($request) {
-    var_dump($user, $request->getArgs());
+    var_dump($user);
 });
 
 $router->get("/pets", "Example", "hello");
