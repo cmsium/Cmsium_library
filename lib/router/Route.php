@@ -13,13 +13,22 @@ class Route {
     public $class;
     public $method;
 
+    public $callback_handler;
+    public $before;
+    public $before_args;
+    public $after;
+    public $after_args;
+
     public $default_args;
     public $args;
 
     public $matchString;
 
-    public function __construct(string $path){
+    public function __construct(string $path, $callbackHandler = null){
         $this->path = $path;
+        if ($callbackHandler) {
+            $this->callback_handler = $callbackHandler;
+        }
         $this->parsePath();
     }
 
@@ -30,6 +39,27 @@ class Route {
     public function attachMethod($class, $method){
         $this->class = $class;
         $this->method = $method;
+    }
+
+    public function before(...$args) {
+        if (count($args) == 1 and $args[0] instanceof Closure){
+            $this->before = $args[0];
+        } else {
+            $this->before = $this->callback_handler->before();
+            $this->before_args = $args;
+        }
+        return $this;
+    }
+
+
+    public function after(...$args) {
+        if (count($args) == 1 and $args[0] instanceof Closure){
+            $this->after = $args[0];
+        } else {
+            $this->after = $this->callback_handler->after();
+            $this->after_args = $args;
+        }
+        return $this;
     }
 
     public function parsePath(){
@@ -79,6 +109,24 @@ class Route {
         $this->args = array_slice($this->args,0,$arg_count);
     }
 
+    public function invokeBefore() {
+        if ($this->before) {
+            $result = $this->before_args ? ($this->before)(...$this->before_args) : ($this->before)();
+            return $result === false ? $result : true;
+        } else {
+            return true;
+        }
+    }
+
+    public function invokeAfter() {
+        if ($this->after) {
+            $result = $this->after_args ? ($this->after)(...$this->after_args) : ($this->after)();
+            return $result === false ? $result : true;
+        } else {
+            return true;
+        }
+    }
+
     public function invokeClosure(){
         if ($this->args) {
             //TODO try catch
@@ -105,11 +153,18 @@ class Route {
     }
 
     public function invoke(Request $request){
-        if ($this->closure) {
-            return $this->invokeClosure();
-        } elseif ($this->method){
-            return $this->invokeMethod($request);
+        if (!$this->invokeBefore()){
+            return false;
         }
+        if ($this->closure) {
+            $result = $this->invokeClosure();
+        } elseif ($this->method){
+            $result = $this->invokeMethod($request);
+        }
+        if (!$this->invokeAfter()){
+            return false;
+        }
+        return $result;
     }
 
 }
