@@ -76,6 +76,7 @@ class Transaction {
     public function commit() {
         $this->begin();
         try {
+            //TODO async?
             $this->invoke();
         } catch (\Exception $e) {
             $this->rollback();
