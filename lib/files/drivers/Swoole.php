@@ -40,7 +40,7 @@ class Swoole {
     }
 
     public function read($file,$callback) {
-        $this->exists($file->path);
+        $this->exists($file);
         if ($file->size <= $this->memory_limit){
             swoole_async_readfile($file->path,$callback);
         } else {
@@ -55,7 +55,7 @@ class Swoole {
     }
 
     public function delete($file) {
-        $this->exists($file->path);
+        $this->exists($file);
         if (!unlink($file->path)) {
             throw new CanNotDeleteFileException();
         }
