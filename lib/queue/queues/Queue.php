@@ -6,4 +6,5 @@ interface Queue {
     public function pop();
     public function stats();
     public function destroy();
+    public function getName();
 }

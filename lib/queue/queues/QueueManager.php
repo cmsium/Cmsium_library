@@ -19,8 +19,8 @@ class QueueManager {
         $this->mode = $mode;
     }
 
-    public function createQueue($name, Queue $queue) {
-        $this->queues[$name] = $queue;
+    public function registerQueue(Queue $queue) {
+        $this->queues[$queue->getName()] = $queue;
     }
 
     public function destroyQueue($name) {
@@ -38,11 +38,13 @@ class QueueManager {
         }
     }
 
+    public function push($queueTag, $queue, $taskData) {
+        $queue->push($taskData);
+    }
+
     public function direct(Task $task) {
         $queue = $this->getQueue($task->queryTag);
-        if (!$queue->push($task->data)){
-            throw new PushErrorException("$task->queryTag queue push task error");
-        }
+        $this->push($task->queryTag, $queue, $task->data);
     }
 
     public function fanout(Task $task) {
@@ -50,20 +52,17 @@ class QueueManager {
             throw new NoQueuesException();
         }
         foreach ($this->queues as $key => $queue){
-            if (!$queue->push($task->data)){
-                throw new PushErrorException("$key queue push task error");
-            }
+            $this->push($key, $queue, $task->data);
         }
     }
 
     public function topic(Task $task) {
         $count = 0;
         foreach ($this->queues as $key => $queue){
+            //TODO wildcard instead of regexp
             if (preg_match($task->queryTag, $key)) {
                 $count++;
-                if (!$queue->push($task->data)) {
-                    throw new PushErrorException("$key queue push task error");
-                }
+                $this->push($key, $queue, $task->data);
             }
         }
         if ($count === 0) {

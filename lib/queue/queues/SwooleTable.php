@@ -1,28 +1,58 @@
 <?php
 namespace Queue\Queues;
+use Queue\Overflow\Overflow;
 
 class SwooleTable implements Queue {
     public $types = [
-        'string' => [\swoole_table::TYPE_STRING, 16],
-        'int' => [\swoole_table::TYPE_INT,  PHP_INT_SIZE]
+        'string' => \swoole_table::TYPE_STRING,
+        'int' => \swoole_table::TYPE_INT
     ];
 
+    public $name;
     public $tasks;
     public $table;
     public $head = 0;
     public $tail = 0;
+    public $overflow;
+    public $pushCount = 0;
+    public $popCount = 0;
 
-    public function __construct($tasks, $taskStructure) {
+    public function __construct($name, $tasks, $taskStructure, $overflow = null) {
         $this->tasks = $tasks;
-        $this->table = new \Swoole\Table($this->tasks);
-        foreach ($taskStructure as $name => $value){
-            $this->table->column($name, $this->types[$value['type']][0], $value['size']);
+        //TODO make it normal way
+        $table_size = bindec(str_pad(1, strlen(decbin((int) $this->tasks - 1)), 0)) * 2;
+        $this->table = new \Swoole\Table($table_size*2);
+        foreach ($taskStructure as $tname => $value){
+            switch ($value['type']){
+                case 'string': $this->table->column($tname, $this->types[$value['type']], $value['size']); break;
+                case 'int': $this->table->column($tname, $this->types[$value['type']]); break;
+            }
         }
         $this->table->create();
+        $this->name = $name;
+        if (!$overflow){
+            $this->overflow = new Overflow();
+        } else {
+            $this->overflow = $overflow;
+        }
+    }
+
+    public function getName(){
+        return $this->name;
     }
 
     public function push($taskData) {
-        $this->table[$this->tail] = $taskData;
+        $result = $this->fpush($taskData);
+        if (!$this->overflow->check($this) or !$result){
+            $this->overflow->invokeCallback();
+            $this->overflow->resolveOverflow($this, $taskData);
+        }
+        return $result;
+    }
+
+    public function fpush($taskData) {
+        $this->pushCount++;
+        @$this->table->set($this->tail, $taskData);
         if (!$this->table->exist($this->tail)){
             return false;
         }
@@ -31,6 +61,7 @@ class SwooleTable implements Queue {
     }
 
     public function pop() {
+        $this->popCount++;
         if (!$this->table->exist($this->head)){
             return false;
         }

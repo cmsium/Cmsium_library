@@ -14,28 +14,28 @@ class Consumer {
 
     public function on($queue, $callback, $fetchTime = null) {
         $queue = $this->getQueue($queue);
-        if (!$fetchTime) {
-            \go(function () use ($queue, $callback) {
-                while (true) {
-                    //TODO make it work
-                    $data = $queue->pop();
-                    if ($data){
-                        $callback($data);
-                    }
-                }
-            });
-        } else {
-            \swoole_timer_tick($fetchTime , [$this, 'invoke'], [$queue, $callback]);
+        if (!$fetchTime){
+            $fetchTime = 1;
         }
+        \swoole_timer_tick($fetchTime , [$this, 'invoke'], [$queue, $callback]);
     }
 
     public function invoke($tid, $args) {
         $queue = $args[0];
         $callback = $args[1];
-        $data = $queue->pop();
-        if ($data){
-            $callback($data);
+        $num = $queue->stats()['queue_num'];
+        if ($num !== 0){
+            $data = $queue->pop();
+            try {
+                $callback($data);
+            } catch (\Exception $e) {
+                $this->returnTask($queue, $data);
+            }
         }
+    }
+
+    public function returnTask($queue, $data) {
+        $queue->push($data);
     }
 
     public function getQueue($name) {

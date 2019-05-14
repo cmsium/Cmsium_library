@@ -2,23 +2,30 @@
 namespace Queue\Queues;
 use Queue\Overflow\Overflow;
 
-class SwooleChannel implements Queue{
+class Redis implements Queue {
     public $name;
+    public $conn;
+    public $count;
     public $tasks;
-    public $chan;
     public $overflow;
     public $pushCount = 0;
     public $popCount = 0;
 
-    public function __construct($name, $tasks, $overflow = null) {
+    public function __construct($name, $tasks, $host, $port, $overflow = null) {
         $this->tasks = $tasks;
-        $this->chan = new \chan($tasks);
+        $this->conn = new \Redis();
+        $this->conn->connect($host, $port);
         $this->name = $name;
+        $this->count = $this->getLen();
         if (!$overflow){
             $this->overflow = new Overflow();
         } else {
             $this->overflow = $overflow;
         }
+    }
+
+    public function getLen() {
+        return $this->conn->lLen($this->getName());
     }
 
     public function getName(){
@@ -36,19 +43,24 @@ class SwooleChannel implements Queue{
 
     public function fpush($taskData) {
         $this->pushCount++;
-        return $this->chan->push($taskData);
+        return $this->conn->rPush($this->getName(), json_encode($taskData));
     }
 
     public function pop() {
         $this->popCount++;
-        return $this->chan->pop();
+        $result = $this->conn->lPop($this->getName());
+        if ($result){
+            $result = json_decode($result, true);
+        }
+        return $result;
     }
 
     public function stats() {
-        return $this->chan->stats();
+        $this->count = $this->getLen();
+        return ['queue_num' => $this->count];
     }
 
     public function destroy() {
-        unset($this->chan);
+        $this->conn->delete($this->name);
     }
 }
