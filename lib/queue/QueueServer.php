@@ -28,6 +28,7 @@ $server->on('receive', function($server, $fd, $from_id, $message) use ($queue) {
     switch ($command){
         case 'push':
             $data = $message[1];
+            var_dump($data);
             $queue->push($data);
             break;
         case 'pop':

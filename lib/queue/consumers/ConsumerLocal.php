@@ -1,10 +1,10 @@
 <?php
-namespace Queue;
+namespace Queue\Consumers;
 
 use Queue\Exceptions\WrongQueueException;
 use Queue\Queues\QueueManager;
 
-class Consumer {
+class ConsumerLocal {
 
     public $queues = [];
 
