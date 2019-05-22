@@ -41,13 +41,19 @@ class QueueClient implements Queue {
     public function push($data) {
         $this->connect();
         $this->client->send(json_encode(['push', $data]));
+        $result = json_decode($this->client->recv(), true);
         $this->close();
+        return $result;
     }
 
     public function destroy() {
         $this->connect();
         $this->client->send(json_encode(['destroy']));
         $this->close();
+    }
+
+    public function getInfo() {
+        return ['name' => $this->name, 'host' => $this->host, 'port' => $this->port];
     }
 
     public function getName() {
@@ -57,4 +63,5 @@ class QueueClient implements Queue {
     public function close() {
         $this->client->close();
     }
+
 }

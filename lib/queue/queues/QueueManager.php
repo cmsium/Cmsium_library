@@ -33,20 +33,24 @@ class QueueManager {
             $mode = $this->mode;
         }
         switch ($mode){
-            case self::DIRECT: $this->direct($headers, $data); break;
-            case self::FANOUT: $this->fanout($headers, $data); break;
-            case self::TOPIC: $this->topic($headers, $data); break;
+            case self::DIRECT: return $this->direct($headers, $data); break;
+            case self::FANOUT:return  $this->fanout($headers, $data); break;
+            case self::TOPIC: return $this->topic($headers, $data); break;
         }
     }
 
     public function push($queueTag, $queue, $taskData) {
-        $queue->push($taskData);
+        $result = $queue->push($taskData);
+        if ($result === false) {
+            throw new PushErrorException();
+        }
+        return $result;
     }
 
     public function direct($headers, $data) {
         $queue_tag = $this->getQueueTag($headers);
         $queue = $this->getQueue($queue_tag);
-        $this->push($queue_tag, $queue, $data);
+        return $this->push($queue_tag, $queue, $data);
     }
 
     public function fanout($headers, $data) {
@@ -56,6 +60,7 @@ class QueueManager {
         foreach ($this->queues as $key => $queue){
             $this->push($key, $queue, $data);
         }
+        return true;
     }
 
     public function topic($headers, $data) {
@@ -71,6 +76,7 @@ class QueueManager {
         if ($count === 0) {
             throw new WrongQueueException();
         }
+        return true;
     }
 
     public function getHeaders() {

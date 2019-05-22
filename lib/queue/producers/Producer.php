@@ -1,6 +1,7 @@
 <?php
 namespace Queue\Producers;
 use Queue\Exceptions\ExchangeConnectError;
+use Queue\Exceptions\PushErrorException;
 
 class Producer{
     public const DIRECT = 0;
@@ -44,6 +45,10 @@ class Producer{
             $message[] = $mode;
         }
         $this->client->send(json_encode($message));
+        $result = json_decode($this->client->recv(), true);
+        if ($result === false){
+            throw new PushErrorException();
+        }
         $this->close();
     }
 

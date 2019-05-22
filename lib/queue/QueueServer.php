@@ -23,23 +23,29 @@ $queue = new \Queue\Queues\SwooleTable('test',1000, \Queue\TestTask::$structure)
 //});
 
 $server->on('receive', function($server, $fd, $from_id, $message) use ($queue) {
-    $message = json_decode($message, true);
-    $command = $message[0];
-    switch ($command){
-        case 'push':
-            $data = $message[1];
-            var_dump($data);
-            $queue->push($data);
-            break;
-        case 'pop':
-            $response = $queue->pop();
-            $server->send($fd, json_encode($response));
-            break;
-        case 'stats':
-            $server->send($fd, json_encode($queue->stats()));
-            break;
-        case 'destroy':
-            $queue->destroy();
+    try {
+        $message = json_decode($message, true);
+        $command = $message[0];
+        switch ($command) {
+            case 'push':
+                $data = $message[1];
+                $result = $queue->push($data);
+                $server->send($fd, json_encode($result));
+                break;
+            case 'pop':
+                $response = $queue->pop();
+                $server->send($fd, json_encode($response));
+                break;
+            case 'stats':
+                $server->send($fd, json_encode($queue->stats()));
+                break;
+            case 'destroy':
+                $queue->destroy();
+        }
+    } catch (\Exception $e) {
+        //TODO logs
+        var_dump($e->getMessage());
+        $server->send($fd, json_encode(false));
     }
 });
 

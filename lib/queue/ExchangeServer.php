@@ -37,15 +37,20 @@ $server->on('receive', function($server, $fd, $from_id, $message) use ($manager)
                 } else {
                     $mode = null;
                 }
-                $manager->route($message[1], $message[2], $mode);
+                $result = $manager->route($message[1], $message[2], $mode);
+                $server->send($fd, json_encode($result));
                 break;
             case 'headers':
                 $server->send($fd, json_encode($manager->getHeaders()));
                 break;
+            case 'queue':
+                $queue = $message[1];
+                $server->send($fd, json_encode($manager->getQueue($queue)->getInfo()));
         }
     } catch (\Exception $e){
         //TODO logs
         var_dump($e->getMessage());
+        $server->send($fd, json_encode(false));
     }
 
 });
