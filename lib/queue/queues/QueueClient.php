@@ -13,11 +13,12 @@ class QueueClient implements Queue {
         $this->name = $name;
         $this->host = $host;
         $this->port = $port;
-        $this->client = new \Swoole\Coroutine\Client(SWOOLE_SOCK_TCP);
     }
 
     public function connect() {
-        if (!$this->client->connect($this->host, $this->port)){
+        $this->client = new \Swoole\Coroutine\Client(SWOOLE_SOCK_TCP);
+        $result = $this->client->connect($this->host, $this->port);
+        if (!$result){
             throw new QueueConnectException();
         }
     }

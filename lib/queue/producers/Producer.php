@@ -16,11 +16,11 @@ class Producer{
     public function __construct($host, $port) {
         $this->host = $host;
         $this->port = $port;
-        $this->client = new \swoole_client(SWOOLE_SOCK_TCP);
         $this->getHeaders();
     }
 
     public function connect() {
+        $this->client = new \swoole_client(SWOOLE_SOCK_TCP);
         if (!$this->client->connect($this->host, $this->port)){
             throw new ExchangeConnectError();
         }

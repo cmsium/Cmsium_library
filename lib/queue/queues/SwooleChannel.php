@@ -26,12 +26,12 @@ class SwooleChannel implements Queue{
     }
 
     public function push($taskData) {
-        $result = $this->fpush($taskData);
-        if (!$this->overflow->check($this) or !$result){
+        $this->fpush($taskData);
+        if (!$this->overflow->check($this)){
             $this->overflow->invokeCallback();
             $this->overflow->resolveOverflow($this, $taskData);
         }
-        return $result;
+        return true;
     }
 
     public function fpush($taskData) {

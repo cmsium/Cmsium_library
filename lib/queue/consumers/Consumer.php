@@ -45,17 +45,23 @@ class Consumer{
     }
 
     public function invoke($tid, $args) {
-        $queue = $args[0];
-        $callback = $args[1];
-        $data = $queue->pop();
-        if ($data) {
-            try {
-                $callback($data);
-            } catch (\Exception $e) {
-                $this->returnTask($queue, $data);
+        try{
+            $queue = $args[0];
+            $callback = $args[1];
+            $data = $queue->pop();
+            if ($data) {
+                try {
+                    $callback($data);
+                } catch (\Exception $ex){
+                    //TODO logs
+                    var_dump($ex->getMessage());
+                    $this->returnTask($queue, $data);
+                }
             }
+        } catch (\Exception $e) {
+            //TODO logs
+            var_dump($e->getMessage());
         }
-
     }
 
     public function returnTask($queue, $data) {

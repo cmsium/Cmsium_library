@@ -1,22 +1,28 @@
 <?php
 namespace Queue;
 
-foreach (glob("exceptions/*.php") as $name){
+define('ROOTDIR', __DIR__);
+foreach (glob(ROOTDIR."/exceptions/*.php") as $name){
     include $name;
 }
-foreach (glob("overflow/*.php") as $name){
+foreach (glob(ROOTDIR."/overflow/*.php") as $name){
     include $name;
 }
-foreach (glob("queues/*.php") as $name){
+foreach (glob(ROOTDIR."/queues/*.php") as $name){
     include $name;
 }
-foreach (glob("tasks/*.php") as $name){
+foreach (glob(ROOTDIR."/tasks/*.php") as $name){
     include $name;
 }
+include ROOTDIR.'/ManifestParser.php';
 
-$server = new \swoole_server("127.0.0.1", 9502);
+$queue_name = $argv[1];
+$parser = new ManifestParser();
+$queue_info = $parser->checkQueue($queue_name);
 
-$queue = new \Queue\Queues\SwooleTable('test',1000, \Queue\TestTask::$structure);
+$queue = $parser->getQueue($queue_name);
+$server = new \swoole_server($queue_info->host, $queue_info->port);
+
 
 //$server->on('connect', function($server, $fd){
 //    TODO logs

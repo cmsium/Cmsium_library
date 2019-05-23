@@ -4,7 +4,6 @@ namespace Queue\Queues;
 use Queue\Exceptions\NoQueuesException;
 use Queue\Exceptions\PushErrorException;
 use Queue\Exceptions\WrongQueueException;
-use Queue\Task;
 
 
 class QueueManager {

@@ -17,12 +17,12 @@ class SwooleTable implements Queue {
     public $pushCount = 0;
     public $popCount = 0;
 
-    public function __construct($name, $tasks, $taskStructure, $overflow = null) {
+    public function __construct($name, $tasks, $task_structure, $overflow = null) {
         $this->tasks = $tasks;
         //TODO make it normal way
         $table_size = bindec(str_pad(1, strlen(decbin((int) $this->tasks - 1)), 0)) * 2;
         $this->table = new \Swoole\Table($table_size*2);
-        foreach ($taskStructure as $tname => $value){
+        foreach ($task_structure as $tname => $value){
             switch ($value['type']){
                 case 'string': $this->table->column($tname, $this->types[$value['type']], $value['size']); break;
                 case 'int': $this->table->column($tname, $this->types[$value['type']]); break;

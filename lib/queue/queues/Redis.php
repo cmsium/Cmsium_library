@@ -11,10 +11,10 @@ class Redis implements Queue {
     public $pushCount = 0;
     public $popCount = 0;
 
-    public function __construct($name, $tasks, $host, $port, $overflow = null) {
+    public function __construct($name, $tasks, $redis_host, $redis_port, $overflow = null) {
         $this->tasks = $tasks;
         $this->conn = new \Redis();
-        $this->conn->connect($host, $port);
+        $this->conn->connect($redis_host, $redis_port);
         $this->name = $name;
         $this->count = $this->getLen();
         if (!$overflow){

@@ -8,8 +8,8 @@ class OverflowTrend extends Overflow {
     public $pushCount = 0;
     public $popCount = 0;
 
-    public function __construct($checkTime, $mode = self::OVERFLOW_ERROR) {
-        $this->checkTime = $checkTime;
+    public function __construct($check_time, $mode = self::OVERFLOW_ERROR) {
+        $this->checkTime = $check_time;
         $this->mode = $mode;
     }
 
@@ -19,7 +19,6 @@ class OverflowTrend extends Overflow {
                 $push = $queue->pushCount;
                 $pop = $queue->popCount;
                 if (($pop - $this->popCount) < ($push - $this->pushCount)){
-                    var_dump($push, $pop);
                     $this->check = false;
                 }
                 $this->popCount = $pop;

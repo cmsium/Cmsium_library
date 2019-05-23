@@ -1,27 +1,30 @@
 <?php
 namespace Queue;
 
-
-use Queue\Queues\QueueClient;
-
-foreach (glob("exceptions/*.php") as $name){
+define('ROOTDIR', __DIR__);
+foreach (glob(ROOTDIR."/exceptions/*.php") as $name){
     include $name;
 }
-foreach (glob("queues/*.php") as $name){
+foreach (glob(ROOTDIR."/queues/*.php") as $name){
     include $name;
 }
-foreach (glob("tasks/*.php") as $name){
+foreach (glob(ROOTDIR."/tasks/*.php") as $name){
     include $name;
 }
+include ROOTDIR.'/ManifestParser.php';
 
 $manager = new Queues\QueueManager();
+$parser = new ManifestParser();
+$queues = $parser->getQueues();
+foreach ($queues as $name => $queue_info){
+    $queue = new Queues\QueueClient($name, $queue_info->host, $queue_info->port);
+    $manager->registerQueue($queue);
+}
 
 
-$queue = new Queues\QueueClient('test', "127.0.0.1", 9502);
-$manager->registerQueue($queue);
-
-
-$server = new \swoole_server("127.0.0.1", 9503);
+//TODO normal config
+$ini = parse_ini_file(ROOTDIR."/config/exchange.ini");
+$server = new \swoole_server($ini['host'], $ini['port']);
 //$server->on('connect', function($server, $fd){
 //    TODO logs
 //});

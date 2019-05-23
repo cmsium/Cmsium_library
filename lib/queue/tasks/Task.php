@@ -1,5 +1,5 @@
 <?php
-namespace Queue;
+namespace Queue\Tasks;
 
 class Task {
     public static $structure = [];
