@@ -77,7 +77,6 @@ class QueueManager {
         $queues=[];
         foreach ($this->queues as $key => $queue){
             $queue_tag = $this->getQueueTag($headers);
-            //TODO wildcard instead of regexp
             if (fnmatch($queue_tag, $key)) {
                 $queues[] = $key;
                 $this->push($key, $queue, $data, true);

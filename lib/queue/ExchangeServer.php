@@ -1,6 +1,8 @@
 <?php
 namespace Queue;
 
+use Queue\Queues\QueueManager;
+
 define('ROOTDIR', __DIR__);
 foreach (glob(ROOTDIR."/exceptions/*.php") as $name){
     include $name;
@@ -13,7 +15,13 @@ foreach (glob(ROOTDIR."/tasks/*.php") as $name){
 }
 include ROOTDIR.'/ManifestParser.php';
 
-$manager = new Queues\QueueManager();
+$ini = parse_ini_file(ROOTDIR."/config/exchange.ini");
+if (isset($ini['mode'])){
+    $mode = constant("Queue\Queues\QueueManager::{$ini['mode']}");
+} else {
+    $mode = null;
+}
+$manager = new QueueManager($mode);
 $parser = new ManifestParser();
 $queues = $parser->getQueues();
 foreach ($queues as $name => $queue_info){
@@ -23,7 +31,6 @@ foreach ($queues as $name => $queue_info){
 
 
 //TODO normal config
-$ini = parse_ini_file(ROOTDIR."/config/exchange.ini");
 $server = new \swoole_server($ini['host'], $ini['port']);
 //$server->on('connect', function($server, $fd){
 //    TODO logs

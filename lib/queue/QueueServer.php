@@ -18,7 +18,7 @@ foreach (glob(ROOTDIR."/tasks/*.php") as $name){
 }
 include ROOTDIR.'/ManifestParser.php';
 
-$options = getopt("n:dp:kp:");
+$options = getopt("n:dp:kp:sp:");
 $queue_name = $options['n'];
 $parser = new ManifestParser();
 $queue_info = $parser->checkQueue($queue_name);
@@ -28,6 +28,13 @@ if (isset($options['k'])){
     go(function () use ($queue_name, $queue_info){
         $client = new QueueClient($queue_name, $queue_info->host, $queue_info->port);
         $client->destroy();
+        $client->stop();
+    });
+    die();
+}
+if (isset($options['s'])){
+    go(function () use ($queue_name, $queue_info){
+        $client = new QueueClient($queue_name, $queue_info->host, $queue_info->port);
         $client->stop();
     });
     die();

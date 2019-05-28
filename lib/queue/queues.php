@@ -10,6 +10,9 @@ $opt = "-d";
 if (isset($argv[1])) {
     switch ($argv[1]) {
         case 'stop':
+            $opt = "-s";
+            break;
+        case 'kill':
             $opt = "-k";
             break;
         case 'start':
