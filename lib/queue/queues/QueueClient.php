@@ -15,6 +15,7 @@ class QueueClient implements Queue {
         $this->port = $port;
     }
 
+    //TODO async way?
     public function connect() {
         $this->client = new \Swoole\Coroutine\Client(SWOOLE_SOCK_TCP);
         $result = $this->client->connect($this->host, $this->port);
@@ -22,6 +23,7 @@ class QueueClient implements Queue {
             throw new QueueConnectException();
         }
     }
+    
 
     public function stats() {
         $this->connect();
@@ -40,8 +42,16 @@ class QueueClient implements Queue {
     }
 
     public function push($data) {
+        $this->apush($data);
+        return $this->receive();
+    }
+
+    public function apush($data) {
         $this->connect();
         $this->client->send(json_encode(['push', $data]));
+    }
+
+    public function receive() {
         $result = json_decode($this->client->recv(), true);
         $this->close();
         return $result;
@@ -50,6 +60,12 @@ class QueueClient implements Queue {
     public function destroy() {
         $this->connect();
         $this->client->send(json_encode(['destroy']));
+        $this->close();
+    }
+
+    public function stop() {
+        $this->connect();
+        $this->client->send(json_encode(['stop']));
         $this->close();
     }
 

@@ -32,24 +32,31 @@ class QueueManager {
             $mode = $this->mode;
         }
         switch ($mode){
-            case self::DIRECT: return $this->direct($headers, $data); break;
-            case self::FANOUT:return  $this->fanout($headers, $data); break;
-            case self::TOPIC: return $this->topic($headers, $data); break;
+            case self::DIRECT: $this->direct($headers, $data); break;
+            case self::FANOUT: $this->fanout($headers, $data); break;
+            case self::TOPIC: $this->topic($headers, $data); break;
         }
     }
 
-    public function push($queueTag, $queue, $taskData) {
-        $result = $queue->push($taskData);
-        if ($result === false) {
-            throw new PushErrorException();
+    public function push($queueTag, $queue, $taskData, $defer = false) {
+        if ($defer){
+            return $queue->apush($taskData);
+        } else {
+            return $queue->push($taskData);
         }
-        return $result;
+    }
+
+    public function receive($queue) {
+        return $queue->receive();
     }
 
     public function direct($headers, $data) {
         $queue_tag = $this->getQueueTag($headers);
         $queue = $this->getQueue($queue_tag);
-        return $this->push($queue_tag, $queue, $data);
+        $result = $this->push($queue_tag, $queue, $data);
+        if ($result === false) {
+            throw new PushErrorException();
+        }
     }
 
     public function fanout($headers, $data) {
@@ -57,25 +64,33 @@ class QueueManager {
             throw new NoQueuesException();
         }
         foreach ($this->queues as $key => $queue){
-            $this->push($key, $queue, $data);
+            $this->push($key, $queue, $data, true);
         }
-        return true;
+        foreach ($this->queues as $key => $queue){
+            if (!$this->receive($queue)){
+                throw new PushErrorException();
+            }
+        }
     }
 
     public function topic($headers, $data) {
-        $count = 0;
+        $queues=[];
         foreach ($this->queues as $key => $queue){
             $queue_tag = $this->getQueueTag($headers);
             //TODO wildcard instead of regexp
-            if (preg_match($queue_tag, $key)) {
-                $count++;
-                $this->push($key, $queue, $data);
+            if (fnmatch($queue_tag, $key)) {
+                $queues[] = $key;
+                $this->push($key, $queue, $data, true);
             }
         }
-        if ($count === 0) {
+        if (empty($queues)) {
             throw new WrongQueueException();
         }
-        return true;
+        foreach ($queues as $qkey){
+            if (!$this->receive($this->queues[$qkey])){
+                throw new PushErrorException();
+            }
+        }
     }
 
     public function getHeaders() {

@@ -40,8 +40,8 @@ $server->on('receive', function($server, $fd, $from_id, $message) use ($manager)
                 } else {
                     $mode = null;
                 }
-                $result = $manager->route($message[1], $message[2], $mode);
-                $server->send($fd, json_encode($result));
+                $manager->route($message[1], $message[2], $mode);
+                $server->send($fd, json_encode(true));
                 break;
             case 'headers':
                 $server->send($fd, json_encode($manager->getHeaders()));

@@ -6,6 +6,18 @@ include ROOTDIR.'/ManifestParser.php';
 
 $parser = new ManifestParser();
 $queues = $parser->getQueues();
+$opt = "-d";
+if (isset($argv[1])) {
+    switch ($argv[1]) {
+        case 'stop':
+            $opt = "-k";
+            break;
+        case 'start':
+            $opt = "-d";
+            break;
+    }
+}
 foreach ($queues as $name => $queue){
-    `php QueueServer.php $name`;
+    $str = "php QueueServer.php -n $name $opt";
+    `$str`;
 }

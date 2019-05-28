@@ -1,6 +1,8 @@
 <?php
 namespace Queue;
 
+use Queue\Queues\QueueClient;
+
 define('ROOTDIR', __DIR__);
 foreach (glob(ROOTDIR."/exceptions/*.php") as $name){
     include $name;
@@ -16,13 +18,25 @@ foreach (glob(ROOTDIR."/tasks/*.php") as $name){
 }
 include ROOTDIR.'/ManifestParser.php';
 
-$queue_name = $argv[1];
+$options = getopt("n:dp:kp:");
+$queue_name = $options['n'];
 $parser = new ManifestParser();
 $queue_info = $parser->checkQueue($queue_name);
 
 $queue = $parser->getQueue($queue_name);
-$server = new \swoole_server($queue_info->host, $queue_info->port);
+if (isset($options['k'])){
+    go(function () use ($queue_name, $queue_info){
+        $client = new QueueClient($queue_name, $queue_info->host, $queue_info->port);
+        $client->destroy();
+        $client->stop();
+    });
+    die();
+}
 
+$server = new \swoole_server($queue_info->host, $queue_info->port);
+if (isset($options['d'])){
+    $server->set(['daemonize' => 1]);
+}
 
 //$server->on('connect', function($server, $fd){
 //    TODO logs
@@ -30,6 +44,7 @@ $server = new \swoole_server($queue_info->host, $queue_info->port);
 
 $server->on('receive', function($server, $fd, $from_id, $message) use ($queue) {
     try {
+        //TODO logs
         $message = json_decode($message, true);
         $command = $message[0];
         switch ($command) {
@@ -47,6 +62,12 @@ $server->on('receive', function($server, $fd, $from_id, $message) use ($queue) {
                 break;
             case 'destroy':
                 $queue->destroy();
+                break;
+            case 'stop':
+                $info = $server->connection_info($fd, $from_id);
+                if ($info['remote_ip'] === $server->host){
+                    $server->shutdown();
+                }
         }
     } catch (\Exception $e) {
         //TODO logs
@@ -54,6 +75,7 @@ $server->on('receive', function($server, $fd, $from_id, $message) use ($queue) {
         $server->send($fd, json_encode(false));
     }
 });
+
 
 //$server->on('close', function($server, $fd){
 //    TODO logs
