@@ -28,7 +28,9 @@ $application = \Webgear\Swoole\Application::getInstance($router);
 $router->get('/hello', function() {
     //// Testing App
     // return \App\Controller\SomeController::hi();
-    return 'hi!';
+    $application = \Webgear\Swoole\Application::getInstance();
+    $application->setHeader('Content-Type', 'text/plain');
+    return $application->respondFile(ROOTDIR.'/INFO', 0, 0);
 });
 
 $router->get('/test', function() {
