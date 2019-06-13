@@ -44,6 +44,7 @@ abstract class Application {
     public function handle($request, $response) {
         $this->request = $request;
         $this->response = $response;
+        $this->response->isFile = false;
 
         // Run pre-business middleware (request callbacks)
         $this->runMiddleware('pre');
