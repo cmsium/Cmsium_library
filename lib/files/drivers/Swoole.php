@@ -63,14 +63,14 @@ class Swoole {
     }
 
     public function send($file,$response) {
-        header('Content-Description: File Transfer');
-        header('Content-Type: application/octet-stream');
-        header('Content-Disposition: attachment; filename="'.$file->name.'"');
-        header('Expires: 0');
-        header('Cache-Control: must-revalidate');
-        header('Pragma: public');
-        header('Content-Length: ' . $file->size);
-        return $response->sendfile($file->name);
+        $response->header('Content-Description', 'File Transfer');
+        $response->header('Content-Type', 'application/octet-stream');
+        $response->header('Content-Disposition', 'attachment; filename="'.$file->name.'"');
+        $response->header('Expires', '0');
+        $response->header('Cache-Control', 'must-revalidate');
+        $response->header('Pragma', 'public');
+        $response->header('Content-Length', "$file->size");
+        return $response->sendfile($file->path);
     }
 
     public function sendChunked($file, $response, $chunkSize) {
@@ -81,15 +81,15 @@ class Swoole {
             $range = substr($_SERVER['HTTP_RANGE'], strpos($_SERVER['HTTP_RANGE'], '=')+1);
             $from = (integer)(strtok($range, "-"));
             $to = (integer)(strtok("-"));
-            header('HTTP/1.1 206 Partial Content');
-            header('Content-Range: bytes '.$from.'-'.($to-1).'/'.$filesize);
+            $response->status(206);
+            $response->header('Content-Range', 'bytes '.$from.'-'.($to-1).'/'.$filesize);
         } else {
-            header('HTTP/1.1 200 Ok');
+            $response->status(200);
         }
-        header('Accept-Ranges: bytes');
-        header('Content-Length: ' . ($filesize-$from));
-        header('Content-Type: application/octet-stream');
-        header('Content-Disposition: attachment; filename="' . $file->name . '";');
+        $response->header('Accept-Ranges', 'bytes');
+        $response->header('Content-Length', ($filesize-$from));
+        header('Content-Type', 'application/octet-stream');
+        header('Content-Disposition', 'attachment; filename="' . $file->name . '";');
         $size = $to - $from;
         $offset = 0;
         while($offset < $size) {
