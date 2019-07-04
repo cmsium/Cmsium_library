@@ -52,6 +52,12 @@ class Producer{
         $this->close();
     }
 
+    public function stop() {
+        $this->connect();
+        $this->client->send(json_encode(['stop']));
+        $this->close();
+    }
+
     public function close() {
         $this->client->close();
     }
