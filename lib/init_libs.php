@@ -4,6 +4,8 @@
  */
 require_once __DIR__.'/../config/defaults.php';
 
+require_once __DIR__.'/../vendor/autoload.php';
+
 /**
  * Функция производит рекурсивное подключение всех php файлов из указанной директории
  *

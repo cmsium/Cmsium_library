@@ -52,5 +52,7 @@ $router->get('/test/callbacks', function() { return 'Hello!'; })->before('callba
 // Add startup callback
 $application->registerStartupCallback(function () { var_dump('I AM STARTUP CALLBACK!'); });
 
+var_dump(new \Swoole\Http\Response);
+
 $server = new \HttpServer\Server($application);
 $server->launch();

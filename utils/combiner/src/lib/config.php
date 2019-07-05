@@ -29,13 +29,14 @@ function writeLock($dirPath, $dataArray) {
 }
 
 function generateAutoload($libsDir, $libs) {
+    // TODO: Generate relative paths or add new action to regenerate autoloads
     $resultString = '<?php'.PHP_EOL.PHP_EOL;
     $autoloadFunctionTempate = file_get_contents(ASSETS_PATH.'/autoload_function.php.template');
     $autoloadRegisterTempate = file_get_contents(ASSETS_PATH.'/autoload_register.php.template');
 
     $resultString .= $autoloadFunctionTempate;
     foreach ($libs as $lib) {
-        $resultString .= sprintf($autoloadRegisterTempate, MAINDIR."/$libsDir/$lib");
+        $resultString .= sprintf($autoloadRegisterTempate, "/$libsDir/$lib");
     }
 
     return file_put_contents(MAINDIR."/$libsDir/autoload.php", $resultString);

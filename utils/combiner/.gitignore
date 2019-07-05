@@ -5,3 +5,4 @@ storehouse/*
 .combiner
 build
 build/*
+.idea

@@ -3,3 +3,4 @@
 vendor
 output
 templates
+composer.lock
