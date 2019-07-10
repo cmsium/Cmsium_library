@@ -72,6 +72,7 @@ class Server {
         $this->swooleServer->on("start", function ($server) {
             try {
                 $this->application->startup();
+                $this->application->server = $this->swooleServer;
             } catch (Exception $exception) {
                 $message = $exception->getMessage();
                 // TODO: Implement logging
