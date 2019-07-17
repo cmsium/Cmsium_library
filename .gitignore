@@ -4,3 +4,4 @@ vendor
 output
 templates
 composer.lock
+.phpunit.result.cache

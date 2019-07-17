@@ -49,11 +49,6 @@ class Server {
             ]);
         }
 
-        $this->swooleServer->on("start", function ($server) {
-            $protocol = $this->https ? 'https' : 'http';
-            echo "HTTP server is started at $protocol://{$this->host}:{$this->port}".PHP_EOL;
-        });
-
         return $this;
     }
 
@@ -73,6 +68,9 @@ class Server {
             try {
                 $this->application->startup();
                 $this->application->server = $this->swooleServer;
+
+                $protocol = $this->https ? 'https' : 'http';
+                echo "HTTP server is started at $protocol://{$this->host}:{$this->port}".PHP_EOL;
             } catch (Exception $exception) {
                 $message = $exception->getMessage();
                 // TODO: Implement logging
