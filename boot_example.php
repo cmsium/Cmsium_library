@@ -21,10 +21,12 @@ $application = \Webgear\Swoole\Application::getInstance($router);
 
 // Routes
 $router->get('/test', function() {
+    app()->setHeader('Content-Type', 'application/json');
+    app()->setCookie('foo', 'bar');
     return ['hi' => 'mark'];
 });
 // End Routes
 
-function app() {
+function app(): \Webgear\Swoole\Application {
     return \Webgear\Swoole\Application::getInstance();
 }

@@ -27,12 +27,10 @@ $application = \Webgear\Swoole\Application::getInstance($router);
 // Routes
 $router->get('/hello', function() {
     //// Testing App
-    // return \App\Controller\SomeController::hi();
     $application = \Webgear\Swoole\Application::getInstance();
     $application->setHeader('Content-Type', 'text/plain');
     $application->setCookie('hi', 'value', 1000, '/some/path', 'some.domain', true, true);
-//    $application->response->redirect('http://google.com');
-    var_dump($application->response);
+    var_dump($application->response->cookie);
     return $application->respondFile(ROOTDIR.'/INFO', 0, 0);
 });
 

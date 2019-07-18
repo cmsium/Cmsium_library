@@ -67,7 +67,6 @@ class Server {
         $this->swooleServer->on("start", function ($server) {
             try {
                 $this->application->startup();
-                $this->application->server = $this->swooleServer;
 
                 $protocol = $this->https ? 'https' : 'http';
                 echo "HTTP server is started at $protocol://{$this->host}:{$this->port}".PHP_EOL;
@@ -89,6 +88,7 @@ class Server {
 
         $this->swooleServer->on("request", function ($request, $response) {
             try {
+                $this->application->server = $this;
                 $this->application->handle($request, $response);
             } catch (Exception $exception) {
                 $message = $exception->getMessage();

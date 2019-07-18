@@ -54,7 +54,7 @@ class Response {
     }
 
     private function cookieParamsToString($name, $value, $expires, $path, $domain, $secure, $httponly) {
-        $resultString = "$name:";
+        $resultString = "$name=";
 
         $resultString .= $value ? "$value;" : 'deleted;';
         $resultString .= 'expires=';

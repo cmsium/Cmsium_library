@@ -7,12 +7,31 @@ class ExampleTest extends \Testgear\TestCase {
         $this->setApplication(app());
     }
 
-    public function testExample() {
+    public function testJsonExample() {
         $response = $this->getJson('/test');
 
         $response->assertExactJson([
-            'hi' => 'mork'
+            'hi' => 'mark'
         ]);
+    }
+
+    public function testSeeExample() {
+        $response = $this->getJson('/test');
+
+        $response->assertSee('mark');
+        $response->assertDontSee('mars');
+    }
+
+    public function testHeaderExample() {
+        $response = $this->getJson('/test');
+
+        $response->assertHeader('Content-Type', 'application/json');
+    }
+
+    public function testCookieExample() {
+        $response = $this->getJson('/test');
+
+        $response->assertCookie('foo', 'bar');
     }
 
 }
