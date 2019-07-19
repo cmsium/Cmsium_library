@@ -10,7 +10,7 @@ class ExampleTest extends \Testgear\TestCase {
     public function testJsonExample() {
         $response = $this->getJson('/test');
 
-        $response->assertExactJson([
+        $response->assertJson([
             'hi' => 'mark'
         ]);
     }

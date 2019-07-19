@@ -24,9 +24,20 @@ trait HttpAssertable {
     }
 
     public function assertJson(array $data) {
+        $result = false;
         $actualData = json_decode($this->result, true);
+
+        // Compare arrays
+        $intersect = array_uintersect_assoc($actualData, $data, function($a, $b) {
+            return $a <=> $b;
+        });
+
+        if ($intersect === $data) {
+            $result = true;
+        }
+
         $message = 'Application response does not contain expected JSON.';
-        $this->testCase->assertContains($data, $actualData, $message);
+        $this->testCase->assertTrue($result, $message);
     }
 
     public function assertExactJson($data) {
