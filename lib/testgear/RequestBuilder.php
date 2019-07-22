@@ -77,11 +77,11 @@ class RequestBuilder {
 
     protected function parseHeaders() {
         $headers = [];
-        array_walk($headers, function($value, $key) {
+        foreach ($this->headers as $key => $value) {
             $headers[strtolower($key)] = $value;
-        });
+        }
 
-        $this->request->header = $headers;
+        $this->request->header = $this->headers;
     }
 
     protected function parseRequestBody() {

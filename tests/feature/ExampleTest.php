@@ -8,7 +8,7 @@ class ExampleTest extends \Testgear\TestCase {
     }
 
     public function testJsonExample() {
-        $response = $this->getJson('/test');
+        $response = $this->getJson('/test', ['x-user-token' => 'as8dasg8daygsd']);
 
         $response->assertJson([
             'hi' => 'mark'
