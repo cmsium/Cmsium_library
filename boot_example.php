@@ -19,10 +19,15 @@ $pipelinePost->addPipe(function ($request) {
 $router = new \Router\Router();
 $application = \Webgear\Swoole\Application::getInstance($router);
 
+// Insert DB connection
+$application->db = new \DB\MysqlConnection;
+
 // Routes
 $router->get('/test', function() {
     app()->setHeader('Content-Type', 'application/json');
     app()->setCookie('foo', 'bar');
+
+    app()->db->insert("INSERT INTO staff(id, name, phone) VALUES (1, 'Richard', '9746356473')");
     return ['hi' => 'mark'];
 });
 // End Routes

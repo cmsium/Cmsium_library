@@ -30,7 +30,6 @@ $router->get('/hello', function() {
     $application = \Webgear\Swoole\Application::getInstance();
     $application->setHeader('Content-Type', 'text/plain');
     $application->setCookie('hi', 'value', 1000, '/some/path', 'some.domain', true, true);
-    var_dump($application->response->cookie);
     return $application->respondFile(ROOTDIR.'/INFO', 0, 0);
 });
 
