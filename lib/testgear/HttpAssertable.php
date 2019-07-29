@@ -55,12 +55,20 @@ trait HttpAssertable {
     }
 
     public function assertStatus($status) {
+        if ($this->status === null) {
+            $this->status = 200;
+        }
+
         $message = 'Application status code does not equal to expected.';
         $this->testCase->assertTrue($this->status == $status, $message);
         return $this;
     }
 
     public function assertStatusNot($status) {
+        if ($this->status === null) {
+            $this->status = 200;
+        }
+
         $message = 'Application status code equals to expected.';
         $this->testCase->assertNotTrue($this->status == $status, $message);
         return $this;
