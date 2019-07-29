@@ -16,11 +16,13 @@ trait HttpAssertable {
     public function assertSee(string $expectedString) {
         $message = 'Application response does not contain expected string.';
         $this->testCase->assertStringContainsString($expectedString, $this->result, $message);
+        return $this;
     }
 
     public function assertDontSee(string $expectedString) {
         $message = 'Application response contains expected string.';
         $this->testCase->assertStringNotContainsString($expectedString, $this->result, $message);
+        return $this;
     }
 
     public function assertJson(array $data) {
@@ -38,6 +40,7 @@ trait HttpAssertable {
 
         $message = 'Application response does not contain expected JSON.';
         $this->testCase->assertTrue($result, $message);
+        return $this;
     }
 
     public function assertExactJson($data) {
@@ -48,16 +51,19 @@ trait HttpAssertable {
         $actualData = json_encode(json_decode($this->result, true));
         $message = 'Expected JSON does not match application response.';
         $this->testCase->assertJsonStringEqualsJsonString($data, $actualData, $message);
+        return $this;
     }
 
     public function assertStatus($status) {
         $message = 'Application status code does not equal to expected.';
         $this->testCase->assertTrue($this->status == $status, $message);
+        return $this;
     }
 
     public function assertStatusNot($status) {
         $message = 'Application status code equals to expected.';
         $this->testCase->assertNotTrue($this->status == $status, $message);
+        return $this;
     }
 
     public function assertHeader($headerName, $value = null) {
@@ -72,6 +78,7 @@ trait HttpAssertable {
         }
 
         $this->testCase->assertTrue($result);
+        return $this;
     }
 
     public function assertHeaderMissing(string $headerName, string $value = null) {
@@ -86,6 +93,7 @@ trait HttpAssertable {
         }
 
         $this->testCase->assertNotTrue($result);
+        return $this;
     }
 
     public function assertCookie(string $name, string $value = null) {
@@ -97,6 +105,7 @@ trait HttpAssertable {
         }
 
         $this->testCase->assertTrue($result, 'Expected cookie not found in application response.');
+        return $this;
     }
 
     public function assertCookieMissing(string $name, string $value = null) {
@@ -108,6 +117,7 @@ trait HttpAssertable {
         }
 
         $this->testCase->assertNotTrue($result, 'Expected cookie found in application response.');
+        return $this;
     }
 
 }
