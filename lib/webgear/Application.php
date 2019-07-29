@@ -80,7 +80,7 @@ abstract class Application {
             // Run post-business middleware (response callbacks)
             $this->runMiddleware('post');
         } catch (\Exception $exception) {
-            $this->errorHandler->handle($exception);
+            $result = $this->errorHandler->handle($exception);
         }
 
         // Finish request-response iteration
