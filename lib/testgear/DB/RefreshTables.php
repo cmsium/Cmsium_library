@@ -16,7 +16,7 @@ trait RefreshTables {
     protected function refreshDB() {
         if (!isset($this->migrator)) {
             // Prepare mocked driver
-            $driver = Mockery::mock('MigrationFile, DB\Interfaces\MigrationStorageDriver');
+            $driver = Mockery::mock('FakeMigrationFile, DB\Interfaces\MigrationStorageDriver');
             $driver->shouldReceive('read')->andReturn([]);
             $driver->shouldReceive('write')->andReturn(true);
             $driver->shouldReceive('clear')->andReturn(true);
