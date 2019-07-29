@@ -5,7 +5,7 @@ function loadRecursive($path, $name) {
     $isPhp = (isset(pathinfo($item)["extension"]) && pathinfo($item)["extension"] === "php");
 
     if (is_file($item) && $isPhp && (basename($item) == "$name.php")) {
-          include $item;
+          include_once $item;
         } elseif (is_dir($item)) {
           loadRecursive($item, $name);
         }
