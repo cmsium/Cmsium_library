@@ -23,8 +23,16 @@ trait CanRequestToApp {
         return $this->handle($path, 'GET', $headers, null);
     }
 
+    public function delete(string $path, array $headers = []): Response {
+        return $this->handle($path, 'DELETE', $headers, null);
+    }
+
     public function post(string $path, $data, array $headers = []): Response {
         return $this->handle($path, 'POST', $headers, $data);
+    }
+
+    public function put(string $path, $data, array $headers = []): Response {
+        return $this->handle($path, 'PUT', $headers, $data);
     }
 
     public function getJson(string $path, array $headers = []): Response {
@@ -32,9 +40,19 @@ trait CanRequestToApp {
         return $this->handle($path, 'GET', $bakedHeaders, null);
     }
 
+    public function deleteJson(string $path, array $headers = []): Response {
+        $bakedHeaders = $this->addJsonContentType($headers);
+        return $this->handle($path, 'DELETE', $bakedHeaders, null);
+    }
+
     public function postJson(string $path, $data, array $headers = []): Response {
         $bakedHeaders = $this->addJsonContentType($headers);
         return $this->handle($path, 'POST', $bakedHeaders, $data);
+    }
+
+    public function putJson(string $path, $data, array $headers = []): Response {
+        $bakedHeaders = $this->addJsonContentType($headers);
+        return $this->handle($path, 'PUT', $bakedHeaders, $data);
     }
 
     public function handle(string $path, string $method, $headers, $data): Response {

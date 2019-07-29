@@ -43,4 +43,12 @@ class ExampleTest extends \Testgear\TestCase {
         $response->assertCookie('foo', 'bar');
     }
 
+    public function testDeleteMethod() {
+        $response = $this->deleteJson('/test', ['x-user-token' => 'as8dasg8daygsd']);
+
+        $response->assertJson([
+            'test' => 'ok'
+        ]);
+    }
+
 }

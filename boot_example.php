@@ -30,6 +30,10 @@ $router->get('/test', function() {
     app()->db->insert("INSERT INTO staff(id, name, phone) VALUES (1, 'Richard', '9746356473')");
     return ['hi' => 'mark'];
 });
+
+$router->delete('/test', function() {
+    return ['test' => 'ok'];
+});
 // End Routes
 
 function app(): \Webgear\Swoole\Application {

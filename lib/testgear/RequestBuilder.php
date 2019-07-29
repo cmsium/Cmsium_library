@@ -10,6 +10,7 @@ class RequestBuilder {
     protected $path;
     protected $method;
     protected $body;
+    protected $acceptRequestBody = ['POST', 'PUT'];
 
     public $request;
 
@@ -50,7 +51,8 @@ class RequestBuilder {
         $this->parseGetQueryString();
         $this->parseHeaders();
 
-        if (($this->request->server['request_method'] == 'POST') && $this->body) {
+        // Check if request method support body payload
+        if (in_array($this->request->server['request_method'], $this->acceptRequestBody) && $this->body) {
             $this->parseRequestBody();
         }
     }
