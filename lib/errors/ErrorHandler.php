@@ -17,23 +17,23 @@ class ErrorHandler {
         }
     }
 
-    public function handle(\Exception $e, $request){
+    public function handle(\Exception $e, $response){
         $this->log($e);
         if (method_exists($e, 'handle')) {
             $e->handle($this->app);
         }
-        return $this->formatOutput($request, $e);
+        return $this->formatOutput($response, $e);
     }
 
-    public function formatOutput($request, \Exception $e) {
-        switch ($request->output_type){
-            case 'string': return $e->getMessage(); break;
-            case 'page': return $this->formatPage($e->getMessage()); break;
-            default: return $this->formatPage($e->getMessage());
+    public function formatOutput($response, \Exception $e) {
+        switch ($response->getHeader('Content-Type')){
+            case 'application/json': return $e->get(); break;
+            case 'text/html': return $this->formatPage($e); break;
+            default: return $this->formatPage($e);
         }
     }
 
-    public function formatPage($data) {
-        return $data;
+    public function formatPage(\Exception $e) {
+        return $e->get();
     }
 }

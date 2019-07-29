@@ -1,20 +1,17 @@
 <?php
 namespace Errors\Traits;
 
-class ValidationException {
+trait ValidationException {
     use AppException;
-
-    protected $code = 422;
-    protected $message = "Validation error";
-    protected $template = "validation_error";
+    public $template = "validation_error";
     public $errors;
 
     public function __construct(array $errors, \Exception $previous = null) {
-        parent::__construct($this->message, $this->code, $previous);
+        parent::__construct("Validation error", 422, $previous);
         $this->errors = $errors;
     }
 
-    public function getMessage() {
+    public function get() {
         return $this->errors;
     }
 }
