@@ -17,16 +17,16 @@ class ErrorHandler {
         }
     }
 
-    public function handle(\Exception $e, $response){
+    public function handle(\Exception $e){
         $this->log($e);
         if (method_exists($e, 'handle')) {
             $e->handle($this->app);
         }
-        return $this->formatOutput($response, $e);
+        return $this->formatOutput($e);
     }
 
-    public function formatOutput($response, \Exception $e) {
-        switch ($response->getHeader('Content-Type')){
+    public function formatOutput(\Exception $e) {
+        switch ($this->app->getHeader('Content-Type')){
             case 'application/json': return $e->get(); break;
             case 'text/html': return $this->formatPage($e); break;
             default: return $this->formatPage($e);
