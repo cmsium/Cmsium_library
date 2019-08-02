@@ -17,7 +17,7 @@ class SwooleMysqlConnection {
 
     use RelationalQueries;
 
-    protected $conn;
+    public $conn;
 
     public function __construct($useDb = true) {
         $config = ConfigManager::module('db');

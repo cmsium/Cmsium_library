@@ -1,11 +1,21 @@
 <?php
 include __DIR__.'/lib/init_libs.php';
 
+function app() {
+    return \HttpServer\Server::getInstance()->currentApp();
+}
+
 // Create test pipeline pre
 $plumber = \Plumber\Plumber::getInstance();
 $pipeline = $plumber->buildPipeline('webgear.pre');
 $pipeline->addPipe(function ($request) {
-//    var_dump($request);
+    $application = app();
+    if (!isset($application->pool)) {
+        $application->pool = \DB\Pool\SwooleMysql::getInstance(
+            '\DB\SwooleMysqlConnection',
+            5
+        );
+    }
 });
 
 // Create test pipeline pre
@@ -24,26 +34,27 @@ $callbackPipeline->addPipe(function () {
 $router = new \Router\Router();
 $application = \Webgear\Swoole\Application::getInstance($router);
 
+//$application->errorHandler = new \Errors\AppErrorHandler($application, new \Presenter\PageBuilder(), 'error');
+
 // Routes
 $router->get('/hello', function() {
     //// Testing App
-    $application = \Webgear\Swoole\Application::getInstance();
+    $application = app();
     $application->setHeader('Content-Type', 'text/plain');
     $application->setCookie('hi', 'value', 1000, '/some/path', 'some.domain', true, true);
     return $application->respondFile(ROOTDIR.'/INFO', 0, 0);
 });
 
 $router->get('/test', function() {
-    $application = \Webgear\Swoole\Application::getInstance();
+    $application = app();
+
     $application->setHeader('X-Hello', 'World');
 
-    $testVar = 'Hello!';
+    $dbConnection = $application->pool->fetch();
+    $dbConnection->insert("INSERT INTO cmsium_library.staff(name, phone) VALUES ('hello', '1236859478')");
+    $application->pool->free($dbConnection);
 
-    // Using Presenter lib to render stuff
-    $page = \Presenter\PageBuilder::getInstance()->build('template');
-    $pageOutput = $page->with(compact('testVar'))->render();
-
-    return $pageOutput;
+    return 'HI!';
 });
 
 $router->get('/test/callbacks', function() { return 'Hello!'; })->before('callbacks.test');
@@ -52,5 +63,5 @@ $router->get('/test/callbacks', function() { return 'Hello!'; })->before('callba
 // Add startup callback
 $application->registerStartupCallback(function () { var_dump('I AM STARTUP CALLBACK!'); });
 
-$server = new \HttpServer\Server($application);
+$server = \HttpServer\Server::getInstance($application);
 $server->launch();
