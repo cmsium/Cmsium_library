@@ -51,10 +51,10 @@ class FileManager {
 
     public function create($path) {
         if (is_string($path)){
-            $file = (new File($path))->with(['driver' => $this->driver]);
+            $file = (new BaseFile($path))->with(['driver' => $this->driver]);
             $this->files[] = $file;
             return $file;
-        } elseif ($path instanceof File){
+        } elseif ($path instanceof BaseFile){
             $path->with(['driver' => $this->driver]);
             $this->files[] = $path;
             return $path;

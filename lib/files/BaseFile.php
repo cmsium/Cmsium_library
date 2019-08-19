@@ -3,7 +3,7 @@ namespace Files;
 /**
  * Class File. Implements a number of methods for working with files.
  */
-class File {
+class BaseFile {
 
     public $id;
     public $path;
