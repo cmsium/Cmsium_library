@@ -2,7 +2,7 @@
 namespace Files;
 use Files\exceptions\NotImageException;
 
-class Image extends BaseFile {
+class BaseImage extends BaseFile {
     public $thumbFormat = 'png';
     public $thumbSize = 100;
     public $thumbPath;

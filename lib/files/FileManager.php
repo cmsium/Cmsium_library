@@ -10,9 +10,9 @@ class FileManager {
 
     public $driver;
     public $types = [
-        'image/jpg' => Image::class,
-        'image/jpeg' => Image::class,
-        'image/png' => Image::class,
+        'image/jpg' => BaseImage::class,
+        'image/jpeg' => BaseImage::class,
+        'image/png' => BaseImage::class,
         'application/pdf' => PDF::class,
         'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
         'application/msword',
