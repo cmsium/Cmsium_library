@@ -1,7 +1,6 @@
 <?php
 namespace Files;
 use Exception;
-use File;
 use Files\exceptions\UnsupportedMIMEException;
 
 

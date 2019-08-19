@@ -1,6 +1,5 @@
 <?php
 namespace Files;
-use File;
 use Files\exceptions\NotImageException;
 
 class Image extends File {

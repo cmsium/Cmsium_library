@@ -1,5 +1,5 @@
 <?php
-
+namespace Files;
 /**
  * Class File. Implements a number of methods for working with files.
  */
