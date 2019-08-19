@@ -6,8 +6,7 @@ class AppErrorHandler extends ErrorHandler {
     protected $pageBuilder;
     protected $defaultErrorTemplate;
 
-    public function __construct($app, $pageBuilder, $defaultErrorTemplate, $logger = null){
-        $this->app = $app;
+    public function __construct($pageBuilder, $defaultErrorTemplate, $logger = null){
         $this->logger = $logger;
         $this->pageBuilder = $pageBuilder;
         $this->defaultErrorTemplate = $defaultErrorTemplate;

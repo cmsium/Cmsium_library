@@ -24,17 +24,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="19ec3854-00fb-432b-91e8-4640656c6759" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/../errors/.idea/php.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../errors/AppErrorHandler.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../errors/traits/AppException.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../errors/traits/ValidationException.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../queue/tasks/FilesDeleteTask.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../errors/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../errors/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../errors/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../errors/classes/AppException.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../errors/classes/ErrorHandler.php" beforeDir="false" afterPath="$PROJECT_DIR$/../errors/ErrorHandler.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../errors/config.ini" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../errors/traits/ValidationException.php" beforeDir="false" afterPath="$PROJECT_DIR$/../errors/traits/ValidationException.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../validation/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../validation/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -100,7 +93,7 @@
       <workItem from="1553856843523" duration="8129000" />
       <workItem from="1554292502909" duration="1327000" />
       <workItem from="1554372238585" duration="3818000" />
-      <workItem from="1564142686357" duration="2179000" />
+      <workItem from="1564142686357" duration="3074000" />
     </task>
     <servers />
   </component>
