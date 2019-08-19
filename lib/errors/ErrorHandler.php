@@ -26,13 +26,21 @@ class ErrorHandler {
 
     public function formatOutput($app, \Exception $e) {
         switch ($app->getHeader('Content-Type')){
-            case 'application/json': return $e->get(); break;
+            case 'application/json': return $this->get($e); break;
             case 'text/html': return $this->formatPage($e); break;
             default: return $this->formatPage($e);
         }
     }
 
     public function formatPage(\Exception $e) {
-        return $e->get();
+        return $this->get($e);
+    }
+
+    public function get(\Exception $e) {
+        if (method_exists($e, 'get')) {
+            return $e->get();
+        } else {
+            return $e->getMessage();
+        }
     }
 }

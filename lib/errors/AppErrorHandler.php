@@ -15,6 +15,6 @@ class AppErrorHandler extends ErrorHandler {
     public function formatPage(\Exception $e) {
         $template = $e->template ?? $this->defaultErrorTemplate;
         $page = $this->pageBuilder->build($template);
-        return $page->with(['error' => $e->get()])->render();
+        return $page->with(['error' => $this->get($e)])->render();
     }
 }
